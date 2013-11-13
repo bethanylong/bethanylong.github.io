@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[My Octopress Blog]]></title>
-  <link href="http://bethanylong.github.io/atom.xml" rel="self"/>
-  <link href="http://bethanylong.github.io/"/>
-  <updated>2013-11-12T22:28:43-08:00</updated>
-  <id>http://bethanylong.github.io/</id>
+  <title><![CDATA[Packet Disarray]]></title>
+  <link href="blog.packetdisarray.com/atom.xml" rel="self"/>
+  <link href="blog.packetdisarray.com/"/>
+  <updated>2013-11-12T22:32:18-08:00</updated>
+  <id>blog.packetdisarray.com/</id>
   <author>
     <name><![CDATA[Bethany Long]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Simplicity]]></title>
-    <link href="http://bethanylong.github.io/2013/05/25/simplicity/"/>
+    <link href="blog.packetdisarray.com/2013/05/25/simplicity/"/>
     <updated>2013-05-25T17:48:00-07:00</updated>
-    <id>http://bethanylong.github.io/2013/05/25/simplicity</id>
+    <id>blog.packetdisarray.com/2013/05/25/simplicity</id>
     <content type="html"><![CDATA[<p>It&rsquo;s a feeling that gets in your bones, and doesn&rsquo;t get out. Like arsenic. And
 lead.</p>
 ]]></content>
@@ -25,9 +25,9 @@ lead.</p>
   
   <entry>
     <title type="html"><![CDATA[Time]]></title>
-    <link href="http://bethanylong.github.io/2013/01/15/time/"/>
+    <link href="blog.packetdisarray.com/2013/01/15/time/"/>
     <updated>2013-01-15T22:16:00-08:00</updated>
-    <id>http://bethanylong.github.io/2013/01/15/time</id>
+    <id>blog.packetdisarray.com/2013/01/15/time</id>
     <content type="html"><![CDATA[<p>If the way we spend our time is the surest indication of who we are, then my
 calling in life must be fruit fly genocide. Now, I&rsquo;m no sadist. I&rsquo;m not evil. My
 hat is whiter than my ancestors&#8217; preferred subterranean source of dietary

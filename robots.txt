@@ -1,4 +1,4 @@
 User-agent: *
 Disallow: 
 
-Sitemap: http://bethanylong.github.io/sitemap.xml 
+Sitemap: blog.packetdisarray.com/sitemap.xml 
