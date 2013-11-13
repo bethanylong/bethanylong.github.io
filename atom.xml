@@ -4,7 +4,7 @@
   <title><![CDATA[My Octopress Blog]]></title>
   <link href="http://bethanylong.github.io/atom.xml" rel="self"/>
   <link href="http://bethanylong.github.io/"/>
-  <updated>2013-11-12T22:12:48-08:00</updated>
+  <updated>2013-11-12T22:18:11-08:00</updated>
   <id>http://bethanylong.github.io/</id>
   <author>
     <name><![CDATA[Bethany Long]]></name>
@@ -12,5 +12,38 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Time]]></title>
+    <link href="http://bethanylong.github.io/2013/01/15/time/"/>
+    <updated>2013-01-15T22:16:00-08:00</updated>
+    <id>http://bethanylong.github.io/2013/01/15/time</id>
+    <content type="html"><![CDATA[<p>If the way we spend our time is the surest indication of who we are, then my
+calling in life must be fruit fly genocide. Now, I&rsquo;m no sadist. I&rsquo;m not evil. My
+hat is whiter than my ancestors&#8217; preferred subterranean source of dietary
+starch. Whatever I&rsquo;m doing, though, the pests always make their way over for
+some target practice, and I oblige with canny ruthlessness.</p>
+
+<p>Recently I had to make the transition from working full-time over winter break
+to working less than half-time as school has started up again. Since that
+change, my working time has been increasingly besieged by meetings and other
+such mundane affairs. There&rsquo;s nothing wrong with them in themselves, but they
+have a way of grinding up my time into crumbs when what I need are loaves.
+Doubling the amount of time I can continuously work on something (within reason)
+tends to increase my productivity by a factor considerably higher than two.</p>
+
+<p>What with everything else I have going on in my life right now, it can be
+tempting to resign myself to the tasks that more resemble flyswatting than
+matters of actual significance (which, unfortunately for my metaphor, can
+include actually resolving bugs). Satsifying though it may be to see the
+entrails of small, bothersome insects splayed across my palms, the figurative
+fruit flies that life sends my way can rarely be dispatched with such abandon.
+The things I consider to be tedious annoyances may well be perceived differently
+by others, and it would do me well to find the good in these things before
+writing them off as time forever lost.</p>
+
+<p>Or something like that.</p>
+]]></content>
+  </entry>
   
 </feed>

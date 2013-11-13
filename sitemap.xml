@@ -1,12 +1,16 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'>
     <url>
+        <loc>http://bethanylong.github.io/2013/01/15/time/</loc>
+        <lastmod>2013-11-12T22:17:49-08:00</lastmod>
+    </url>
+    <url>
         <loc>http://bethanylong.github.io/</loc>
-        <lastmod>2013-11-12T22:12:06-08:00</lastmod>
+        <lastmod>2013-11-12T22:17:49-08:00</lastmod>
     </url>
     <url>
         <loc>http://bethanylong.github.io/archives/</loc>
-        <lastmod>2013-11-12T21:52:47-08:00</lastmod>
+        <lastmod>2013-11-12T22:17:49-08:00</lastmod>
     </url>
     <url>
         <loc>http://bethanylong.github.io/robots.txt</loc>
