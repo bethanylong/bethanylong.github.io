@@ -4,7 +4,7 @@
   <title><![CDATA[My Octopress Blog]]></title>
   <link href="http://bethanylong.github.io/atom.xml" rel="self"/>
   <link href="http://bethanylong.github.io/"/>
-  <updated>2013-11-12T22:18:11-08:00</updated>
+  <updated>2013-11-12T22:28:43-08:00</updated>
   <id>http://bethanylong.github.io/</id>
   <author>
     <name><![CDATA[Bethany Long]]></name>
@@ -12,6 +12,16 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Simplicity]]></title>
+    <link href="http://bethanylong.github.io/2013/05/25/simplicity/"/>
+    <updated>2013-05-25T17:48:00-07:00</updated>
+    <id>http://bethanylong.github.io/2013/05/25/simplicity</id>
+    <content type="html"><![CDATA[<p>It&rsquo;s a feeling that gets in your bones, and doesn&rsquo;t get out. Like arsenic. And
+lead.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Time]]></title>
