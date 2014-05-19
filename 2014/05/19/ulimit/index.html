@@ -5,13 +5,12 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Simplicity - Packet Disarray</title>
+  <title>Unix Resource Limits - Packet Disarray</title>
   <meta name="author" content="Bethany Long">
 
   
-  <meta name="description" content="It&rsquo;s a feeling that gets in your bones, and doesn&rsquo;t get out. Like arsenic. And
-lead.
-">
+  <meta name="description" content="In Unix-like systems, the ulimit command lets you check resource limits. When
+these limits are updated, they only apply to sessions started after the &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -20,7 +19,7 @@ lead.
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="blog.packetdisarray.com/2013/05/25/simplicity">
+  <link rel="canonical" href="blog.packetdisarray.com/2014/05/19/ulimit">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="Packet Disarray" type="application/atom+xml">
@@ -71,7 +70,7 @@ lead.
   
   <header>
     
-      <h1 class="entry-title">Simplicity</h1>
+      <h1 class="entry-title">Unix Resource Limits</h1>
     
     
       <p class="meta">
@@ -87,15 +86,68 @@ lead.
   
 
 
-<time datetime="2013-05-25T17:48:00-07:00" pubdate data-updated="true">May 25<span>th</span>, 2013</time>
+<time datetime="2014-05-19T15:26:00-07:00" pubdate data-updated="true">May 19<span>th</span>, 2014</time>
         
       </p>
     
   </header>
 
 
-<div class="entry-content"><p>It&rsquo;s a feeling that gets in your bones, and doesn&rsquo;t get out. Like arsenic. And
-lead.</p>
+<div class="entry-content"><p>In Unix-like systems, the <code>ulimit</code> command lets you check resource limits. When
+these limits are updated, they only apply to sessions started after the change.</p>
+
+<pre><code>$ ulimit -a
+core file size          (blocks, -c) unlimited
+data seg size           (kbytes, -d) 524288
+file size               (blocks, -f) unlimited
+max locked memory       (kbytes, -l) 335262
+max memory size         (kbytes, -m) 1004356
+open files                      (-n) 128
+pipe size            (512 bytes, -p) 1
+stack size              (kbytes, -s) 4096
+cpu time               (seconds, -t) unlimited
+max user processes              (-u) 64
+virtual memory          (kbytes, -v) 528384
+</code></pre>
+
+<p>The one that you probably want to pay the most attention to is &ldquo;max user
+processes&rdquo;. Reducing it low enough will prevent a
+<a href="http://en.wikipedia.org/wiki/Fork_bomb">fork bomb</a> from succeeding in making
+your system unresponsive. However, setting it too low will keep users from doing
+normal tasks, especially if that involves compiling programs. Depending on the
+system&rsquo;s purpose and on whether a restrictive process limit is imposed on all
+users or just a few, anywhere from 50 to 300 or so could be a good choice.</p>
+
+<p>Linux and Unix OSs tend to err on the side of permissiveness where process
+limits are concerned.</p>
+
+<pre><code>$ ulimit -u
+34290
+</code></pre>
+
+<p>Oops. Better fix that.</p>
+
+<p>Resource limits can be changed for a single session by giving a value after the
+command line flag for that limit. Once you lower a resource limit for a
+session, you might not be able to raise it again unless you&rsquo;re root.</p>
+
+<pre><code>$ ulimit -u 300
+$ ulimit -u
+300
+$ ulimit -u 34290
+-bash: ulimit: max user processes: cannot modify limit: Operation not permitted
+</code></pre>
+
+<p>If you want to change a resource limit for <em>all</em> new sessions, the method varies
+by OS.</p>
+
+<h2>Linux</h2>
+
+<p><em>More info:</em> <code>man 5 limits.conf</code></p>
+
+<h2>FreeBSD, NetBSD, OpenBSD</h2>
+
+<p><em>More info:</em> <code>man 5 login.conf</code>, <code>man 1 cap_mkdb</code></p>
 </div>
 
 
@@ -118,7 +170,7 @@ lead.</p>
   
 
 
-<time datetime="2013-05-25T17:48:00-07:00" pubdate data-updated="true">May 25<span>th</span>, 2013</time>
+<time datetime="2014-05-19T15:26:00-07:00" pubdate data-updated="true">May 19<span>th</span>, 2014</time>
       
 
 
@@ -126,7 +178,7 @@ lead.</p>
     
       <div class="sharing">
   
-  <a href="//twitter.com/share" class="twitter-share-button" data-url="blog.packetdisarray.com/2013/05/25/simplicity/" data-via="" data-counturl="blog.packetdisarray.com/2013/05/25/simplicity/" >Tweet</a>
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="blog.packetdisarray.com/2014/05/19/ulimit/" data-via="" data-counturl="blog.packetdisarray.com/2014/05/19/ulimit/" >Tweet</a>
   
   
   
@@ -134,8 +186,6 @@ lead.</p>
 
     
     <p class="meta">
-      
-        <a class="basic-alignment left" href="/2013/01/15/time/" title="Previous Post: Time">&laquo; Time</a>
       
       
     </p>
@@ -151,11 +201,7 @@ lead.</p>
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/2013/05/25/simplicity/">Simplicity</a>
-      </li>
-    
-      <li class="post">
-        <a href="/2013/01/15/time/">Time</a>
+        <a href="/2014/05/19/ulimit/">Unix Resource Limits</a>
       </li>
     
   </ul>
@@ -172,7 +218,7 @@ lead.</p>
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2013 - Bethany Long -
+  Copyright &copy; 2014 - Bethany Long -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 

@@ -4,7 +4,7 @@
   <title><![CDATA[Packet Disarray]]></title>
   <link href="blog.packetdisarray.com/atom.xml" rel="self"/>
   <link href="blog.packetdisarray.com/"/>
-  <updated>2013-11-15T20:37:34-08:00</updated>
+  <updated>2014-05-19T16:01:08-07:00</updated>
   <id>blog.packetdisarray.com/</id>
   <author>
     <name><![CDATA[Bethany Long]]></name>
@@ -14,45 +14,65 @@
 
   
   <entry>
-    <title type="html"><![CDATA[Simplicity]]></title>
-    <link href="blog.packetdisarray.com/2013/05/25/simplicity/"/>
-    <updated>2013-05-25T17:48:00-07:00</updated>
-    <id>blog.packetdisarray.com/2013/05/25/simplicity</id>
-    <content type="html"><![CDATA[<p>It&rsquo;s a feeling that gets in your bones, and doesn&rsquo;t get out. Like arsenic. And
-lead.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Time]]></title>
-    <link href="blog.packetdisarray.com/2013/01/15/time/"/>
-    <updated>2013-01-15T22:16:00-08:00</updated>
-    <id>blog.packetdisarray.com/2013/01/15/time</id>
-    <content type="html"><![CDATA[<p>If the way we spend our time is the surest indication of who we are, then my
-calling in life must be fruit fly genocide. Now, I&rsquo;m no sadist. I&rsquo;m not evil. My
-hat is whiter than my ancestors&#8217; preferred subterranean source of dietary
-starch. Whatever I&rsquo;m doing, though, the pests always make their way over for
-some target practice, and I oblige with canny ruthlessness.</p>
+    <title type="html"><![CDATA[Unix Resource Limits]]></title>
+    <link href="blog.packetdisarray.com/2014/05/19/ulimit/"/>
+    <updated>2014-05-19T15:26:00-07:00</updated>
+    <id>blog.packetdisarray.com/2014/05/19/ulimit</id>
+    <content type="html"><![CDATA[<p>In Unix-like systems, the <code>ulimit</code> command lets you check resource limits. When
+these limits are updated, they only apply to sessions started after the change.</p>
 
-<p>Recently I had to make the transition from working full-time over winter break
-to working less than half-time as school has started up again. Since that
-change, my working time has been increasingly besieged by meetings and other
-such mundane affairs. There&rsquo;s nothing wrong with them in themselves, but they
-have a way of grinding up my time into crumbs when what I need are loaves.
-Doubling the amount of time I can continuously work on something (within reason)
-tends to increase my productivity by a factor considerably higher than two.</p>
+<pre><code>$ ulimit -a
+core file size          (blocks, -c) unlimited
+data seg size           (kbytes, -d) 524288
+file size               (blocks, -f) unlimited
+max locked memory       (kbytes, -l) 335262
+max memory size         (kbytes, -m) 1004356
+open files                      (-n) 128
+pipe size            (512 bytes, -p) 1
+stack size              (kbytes, -s) 4096
+cpu time               (seconds, -t) unlimited
+max user processes              (-u) 64
+virtual memory          (kbytes, -v) 528384
+</code></pre>
 
-<p>What with everything else I have going on in my life right now, it can be
-tempting to resign myself to the tasks that more resemble flyswatting than
-matters of actual significance (which, unfortunately for my metaphor, can
-include actually resolving bugs). Satsifying though it may be to see the
-entrails of small, bothersome insects splayed across my palms, the figurative
-fruit flies that life sends my way can rarely be dispatched with such abandon.
-The things I consider to be tedious annoyances may well be perceived differently
-by others, and it would do me well to find the good in these things before
-writing them off as time forever lost.</p>
+<p>The one that you probably want to pay the most attention to is &ldquo;max user
+processes&rdquo;. Reducing it low enough will prevent a
+<a href="http://en.wikipedia.org/wiki/Fork_bomb">fork bomb</a> from succeeding in making
+your system unresponsive. However, setting it too low will keep users from doing
+normal tasks, especially if that involves compiling programs. Depending on the
+system&rsquo;s purpose and on whether a restrictive process limit is imposed on all
+users or just a few, anywhere from 50 to 300 or so could be a good choice.</p>
 
-<p>Or something like that.</p>
+<p>Linux and Unix OSs tend to err on the side of permissiveness where process
+limits are concerned.</p>
+
+<pre><code>$ ulimit -u
+34290
+</code></pre>
+
+<p>Oops. Better fix that.</p>
+
+<p>Resource limits can be changed for a single session by giving a value after the
+command line flag for that limit. Once you lower a resource limit for a
+session, you might not be able to raise it again unless you&rsquo;re root.</p>
+
+<pre><code>$ ulimit -u 300
+$ ulimit -u
+300
+$ ulimit -u 34290
+-bash: ulimit: max user processes: cannot modify limit: Operation not permitted
+</code></pre>
+
+<p>If you want to change a resource limit for <em>all</em> new sessions, the method varies
+by OS.</p>
+
+<h2>Linux</h2>
+
+<p><em>More info:</em> <code>man 5 limits.conf</code></p>
+
+<h2>FreeBSD, NetBSD, OpenBSD</h2>
+
+<p><em>More info:</em> <code>man 5 login.conf</code>, <code>man 1 cap_mkdb</code></p>
 ]]></content>
   </entry>
   
