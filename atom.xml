@@ -4,7 +4,7 @@
   <title><![CDATA[Packet Disarray]]></title>
   <link href="blog.packetdisarray.com/atom.xml" rel="self"/>
   <link href="blog.packetdisarray.com/"/>
-  <updated>2014-05-29T10:46:39-07:00</updated>
+  <updated>2014-05-29T10:48:36-07:00</updated>
   <id>blog.packetdisarray.com/</id>
   <author>
     <name><![CDATA[Bethany Long]]></name>
@@ -25,7 +25,7 @@ disks on my <a href="https://wiki.debian.org/Xen#Xen_Overview">Xen</a> hyperviso
 When I&rsquo;d rather not go through the filesystems and choose what to delete, or when
 I&rsquo;ve already done that and they&rsquo;re still too full, it&rsquo;s really convenient to be
 able to just extend the disk. For this reason, I try to keep at least 1 TB of space
-unallocated on my hypervisor&rsquo;s main LVM physical volume.</p>
+unallocated on my hypervisor&rsquo;s main LVM volume group.</p>
 
 <h2>Procedure</h2>
 
