@@ -114,7 +114,7 @@ is called <code>storage</code> on a hypervisor called <code>host</code>, and <co
 <a href="http://tldp.org/HOWTO/LVM-HOWTO/vg.html">VG</a> called <code>hard-disk</code>. I want to extend
 <code>storage</code>&rsquo;s size to 750 GB.</p>
 
-<p>First, check that there&rsquo;s enough free space on the VG (at least 250 GB, in this case):</p>
+<p>First, I check that there&rsquo;s enough free space on the VG (at least 250 GB, in this case):</p>
 
 <pre><code>host$ sudo vgdisplay hard-disk
 --- Volume group ---
@@ -139,7 +139,7 @@ Free  PE / Size       254596 / 994.52 GiB
 </code></pre>
 
 <p>For safety, I shut down <code>guest</code>. (If <code>guest</code> were running FreeBSD rather than
-Debian, I would have used the <code>-p</code> flag rather than <code>-h</code>.).</p>
+Debian, I would have used the <code>-p</code> flag rather than <code>-h</code>.)</p>
 
 <pre><code>guest$ sudo shutdown -h now
 </code></pre>
