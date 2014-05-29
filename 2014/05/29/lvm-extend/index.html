@@ -5,7 +5,7 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Packet Disarray</title>
+  <title>Extending LVM Volume Size - Packet Disarray</title>
   <meta name="author" content="Bethany Long">
 
   
@@ -20,7 +20,7 @@ disks on my Xen hypervisor. It&rsquo;s mostly
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="blog.packetdisarray.com">
+  <link rel="canonical" href="blog.packetdisarray.com/2014/05/29/lvm-extend">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="Packet Disarray" type="application/atom+xml">
@@ -66,15 +66,12 @@ disks on my Xen hypervisor. It&rsquo;s mostly
 </nav>
   <div id="main">
     <div id="content">
-      <div class="blog-index">
+      <div>
+<article class="hentry" role="article">
   
-  
-  
-    <article>
-      
   <header>
     
-      <h1 class="entry-title"><a href="/2014/05/29/lvm-extend/">Extending LVM Volume Size</a></h1>
+      <h1 class="entry-title">Extending LVM Volume Size</h1>
     
     
       <p class="meta">
@@ -97,7 +94,7 @@ disks on my Xen hypervisor. It&rsquo;s mostly
   </header>
 
 
-  <div class="entry-content"><p>I use <a href="http://tldp.org/HOWTO/LVM-HOWTO/whatisvolman.html">LVM</a> to manage virtual
+<div class="entry-content"><p>I use <a href="http://tldp.org/HOWTO/LVM-HOWTO/whatisvolman.html">LVM</a> to manage virtual
 disks on my <a href="https://wiki.debian.org/Xen#Xen_Overview">Xen</a> hypervisor. It&rsquo;s mostly
 &ldquo;set it and forget it&rdquo;, but occasionally, the virtual disks get close to filling up.
 (Monitoring this with Nagios gives me plenty of warning!)
@@ -172,22 +169,16 @@ despite the LV being larger.</p>
 with <code>df -h /dev/xvda5</code>. On <code>host</code>, I can verify that the LV was extended with
 <code>sudo lvdisplay /dev/hard-disk/storage</code>.</p>
 </div>
-  
-  
 
 
-    </article>
-  
-  
-    <article>
+  <footer>
+    <p class="meta">
       
-  <header>
-    
-      <h1 class="entry-title"><a href="/2014/05/19/ulimit/">Unix Resource Limits</a></h1>
-    
-    
-      <p class="meta">
-        
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Bethany Long</span></span>
+
+      
 
 
 
@@ -199,81 +190,32 @@ with <code>df -h /dev/xvda5</code>. On <code>host</code>, I can verify that the 
   
 
 
-<time datetime="2014-05-19T15:26:00-07:00" pubdate data-updated="true">May 19<span>th</span>, 2014</time>
-        
-      </p>
+<time datetime="2014-05-29T09:37:00-07:00" pubdate data-updated="true">May 29<span>th</span>, 2014</time>
+      
+
+
+    </p>
     
-  </header>
-
-
-  <div class="entry-content"><p>In Unix-like systems, the <code>ulimit</code> command lets you check resource limits. When
-these limits are updated, they only apply to sessions started after the change.</p>
-
-<pre><code>$ ulimit -a
-core file size          (blocks, -c) unlimited
-data seg size           (kbytes, -d) 524288
-file size               (blocks, -f) unlimited
-max locked memory       (kbytes, -l) 335262
-max memory size         (kbytes, -m) 1004356
-open files                      (-n) 128
-pipe size            (512 bytes, -p) 1
-stack size              (kbytes, -s) 4096
-cpu time               (seconds, -t) unlimited
-max user processes              (-u) 64
-virtual memory          (kbytes, -v) 528384
-</code></pre>
-
-<p>The one that you probably want to pay the most attention to is &ldquo;max user
-processes&rdquo;. Reducing it low enough will prevent a
-<a href="http://en.wikipedia.org/wiki/Fork_bomb">fork bomb</a> from succeeding in making
-your system unresponsive. However, setting it too low will keep users from doing
-normal tasks, especially if that involves compiling programs. Depending on the
-system&rsquo;s purpose and on whether a restrictive process limit is imposed on all
-users or just a few, anywhere from 50 to 300 or so could be a good choice.</p>
-
-<p>Linux and Unix OSs tend to err on the side of permissiveness where process
-limits are concerned.</p>
-
-<pre><code>$ ulimit -u
-34290
-</code></pre>
-
-<p>Oops. Better fix that.</p>
-
-<p>Resource limits can be changed for a single session by giving a value after the
-command line flag for that limit. Once you lower a resource limit for a
-session, you might not be able to raise it again unless you&rsquo;re root.</p>
-
-<pre><code>$ ulimit -u 300
-$ ulimit -u
-300
-$ ulimit -u 34290
--bash: ulimit: max user processes: cannot modify limit: Operation not permitted
-</code></pre>
-
-<p>If you want to change a resource limit for <em>all</em> new sessions, the method varies
-by OS.</p>
-
-<h2>Linux</h2>
-
-<p><em>More info:</em> <code>man 5 limits.conf</code></p>
-
-<h2>FreeBSD, NetBSD, OpenBSD</h2>
-
-<p><em>More info:</em> <code>man 5 login.conf</code>, <code>man 1 cap_mkdb</code></p>
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="blog.packetdisarray.com/2014/05/29/lvm-extend/" data-via="" data-counturl="blog.packetdisarray.com/2014/05/29/lvm-extend/" >Tweet</a>
+  
+  
+  
 </div>
-  
-  
 
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/2014/05/19/ulimit/" title="Previous Post: Unix Resource Limits">&laquo; Unix Resource Limits</a>
+      
+      
+    </p>
+  </footer>
+</article>
 
-    </article>
-  
-  <div class="pagination">
-    
-    <a href="/archives">Blog Archives</a>
-    
-  </div>
 </div>
+
 <aside class="sidebar">
   
     <section>
@@ -297,6 +239,7 @@ by OS.</p>
 
   
 </aside>
+
 
     </div>
   </div>
