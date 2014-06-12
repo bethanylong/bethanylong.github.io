@@ -4,7 +4,7 @@
   <title><![CDATA[Packet Disarray]]></title>
   <link href="blog.packetdisarray.com/atom.xml" rel="self"/>
   <link href="blog.packetdisarray.com/"/>
-  <updated>2014-05-29T10:48:36-07:00</updated>
+  <updated>2014-06-11T21:38:11-07:00</updated>
   <id>blog.packetdisarray.com/</id>
   <author>
     <name><![CDATA[Bethany Long]]></name>
@@ -16,7 +16,7 @@
   <entry>
     <title type="html"><![CDATA[Extending LVM Volume Size]]></title>
     <link href="blog.packetdisarray.com/2014/05/29/lvm-extend/"/>
-    <updated>2014-05-29T09:37:00-07:00</updated>
+    <updated>2014-05-29T00:00:00-07:00</updated>
     <id>blog.packetdisarray.com/2014/05/29/lvm-extend</id>
     <content type="html"><![CDATA[<p>I use <a href="http://tldp.org/HOWTO/LVM-HOWTO/whatisvolman.html">LVM</a> to manage virtual
 disks on my <a href="https://wiki.debian.org/Xen#Xen_Overview">Xen</a> hypervisor. It&rsquo;s mostly
@@ -34,6 +34,9 @@ which shows up as <code>/dev/xvda5</code> on a virtual machine called <code>gues
 is called <code>storage</code> on a hypervisor called <code>host</code>, and <code>storage</code> lives on a
 <a href="http://tldp.org/HOWTO/LVM-HOWTO/vg.html">VG</a> called <code>hard-disk</code>. I want to extend
 <code>storage</code>&rsquo;s size to 750 GB.</p>
+
+<!-- more -->
+
 
 <p>First, I check that there&rsquo;s enough free space on the VG (at least 250 GB, in this case):</p>
 
@@ -98,7 +101,7 @@ with <code>df -h /dev/xvda5</code>. On <code>host</code>, I can verify that the 
   <entry>
     <title type="html"><![CDATA[Unix Resource Limits]]></title>
     <link href="blog.packetdisarray.com/2014/05/19/ulimit/"/>
-    <updated>2014-05-19T15:26:00-07:00</updated>
+    <updated>2014-05-19T00:00:00-07:00</updated>
     <id>blog.packetdisarray.com/2014/05/19/ulimit</id>
     <content type="html"><![CDATA[<p>In Unix-like systems, the <code>ulimit</code> command lets you check resource limits. When
 these limits are updated, they only apply to sessions started after the change.</p>
@@ -133,6 +136,9 @@ limits are concerned.</p>
 </code></pre>
 
 <p>Oops. Better fix that.</p>
+
+<!-- more -->
+
 
 <p>Resource limits can be changed for a single session by giving a value after the
 command line flag for that limit. Once you lower a resource limit for a

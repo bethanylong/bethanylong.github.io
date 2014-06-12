@@ -90,7 +90,7 @@ disks on my Xen hypervisor. It&rsquo;s mostly
   
 
 
-<time datetime="2014-05-29T09:37:00-07:00" pubdate data-updated="true">May 29<span>th</span>, 2014</time>
+<time datetime="2014-05-29T00:00:00-07:00" pubdate data-updated="true">May 29<span>th</span>, 2014</time>
         
       </p>
     
@@ -114,65 +114,12 @@ is called <code>storage</code> on a hypervisor called <code>host</code>, and <co
 <a href="http://tldp.org/HOWTO/LVM-HOWTO/vg.html">VG</a> called <code>hard-disk</code>. I want to extend
 <code>storage</code>&rsquo;s size to 750 GB.</p>
 
-<p>First, I check that there&rsquo;s enough free space on the VG (at least 250 GB, in this case):</p>
-
-<pre><code>host$ sudo vgdisplay hard-disk
---- Volume group ---
-VG Name               hard-disk
-System ID             
-Format                lvm2
-Metadata Areas        1
-Metadata Sequence No  6
-VG Access             read/write
-VG Status             resizable
-MAX LV                0
-Cur LV                5
-Open LV               5
-Max PV                0
-Cur PV                1
-Act PV                1
-VG Size               2.73 TiB
-PE Size               4.00 MiB
-Total PE              715396
-Alloc PE / Size       460800 / 1.76 TiB
-Free  PE / Size       254596 / 994.52 GiB
-</code></pre>
-
-<p>For safety, I shut down <code>guest</code>. (If <code>guest</code> were running FreeBSD rather than
-Debian, I would have used the <code>-p</code> flag rather than <code>-h</code>.)</p>
-
-<pre><code>guest$ sudo shutdown -h now
-</code></pre>
-
-<p>Once <code>guest</code> has been shut down, I extend <code>storage</code>&rsquo;s LV size:</p>
-
-<pre><code>host$ sudo lvextend -L750G /dev/hard-disk/storage
-</code></pre>
-
-<p>The LV <code>storage</code> is just a block device. The filesystem on top of it (ext4)
-needs to be resized as well. But before that, I need to check the filesystem
-for errors:</p>
-
-<pre><code>host$ sudo e2fsck -f /dev/hard-disk/storage
-</code></pre>
-
-<p>Now I can extend the filesystem to cover the entire LV. If I skipped this step,
-the filesystem size wouldn&rsquo;t be any different after starting <code>guest</code> back up again,
-despite the LV being larger.</p>
-
-<pre><code>host$ sudo resize2fs /dev/hard-disk/storage
-</code></pre>
-
-<p>Finally, I start up <code>guest</code>, which involves this in my case:</p>
-
-<pre><code>host$ sudo xm create /etc/xen/guest.cfg
-</code></pre>
-
-<p>Once <code>guest</code> is up, I can verify that <code>storage</code> and the filesystem were extended
-with <code>df -h /dev/xvda5</code>. On <code>host</code>, I can verify that the LV was extended with
-<code>sudo lvdisplay /dev/hard-disk/storage</code>.</p>
 </div>
   
+  
+    <footer>
+      <a rel="full-article" href="/2014/05/29/lvm-extend/">Read on &rarr;</a>
+    </footer>
   
 
 
@@ -199,7 +146,7 @@ with <code>df -h /dev/xvda5</code>. On <code>host</code>, I can verify that the 
   
 
 
-<time datetime="2014-05-19T15:26:00-07:00" pubdate data-updated="true">May 19<span>th</span>, 2014</time>
+<time datetime="2014-05-19T00:00:00-07:00" pubdate data-updated="true">May 19<span>th</span>, 2014</time>
         
       </p>
     
@@ -240,29 +187,12 @@ limits are concerned.</p>
 
 <p>Oops. Better fix that.</p>
 
-<p>Resource limits can be changed for a single session by giving a value after the
-command line flag for that limit. Once you lower a resource limit for a
-session, you might not be able to raise it again unless you&rsquo;re root.</p>
-
-<pre><code>$ ulimit -u 300
-$ ulimit -u
-300
-$ ulimit -u 34290
--bash: ulimit: max user processes: cannot modify limit: Operation not permitted
-</code></pre>
-
-<p>If you want to change a resource limit for <em>all</em> new sessions, the method varies
-by OS.</p>
-
-<h2>Linux</h2>
-
-<p><em>More info:</em> <code>man 5 limits.conf</code></p>
-
-<h2>FreeBSD, NetBSD, OpenBSD</h2>
-
-<p><em>More info:</em> <code>man 5 login.conf</code>, <code>man 1 cap_mkdb</code></p>
 </div>
   
+  
+    <footer>
+      <a rel="full-article" href="/2014/05/19/ulimit/">Read on &rarr;</a>
+    </footer>
   
 
 
