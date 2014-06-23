@@ -72,6 +72,78 @@
       
   <header>
     
+      <h1 class="entry-title"><a href="/2014/06/23/freebsd-puppet-uninitialized-class-variable-lock/">Puppet Errors on FreeBSD: Uninitialized Class Variable @@lock in Object</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-06-23T00:00:00-07:00" pubdate data-updated="true">Jun 23<span>rd</span>, 2014</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>I was vexed by this error when setting up a host with Puppet 3.6.2 on FreeBSD 9.2 recently:</p>
+
+<pre><code>Error: Could not set 'present' on ensure: uninitialized class variable @@lock in Object at 52:/usr/local/etc/puppet/modules/ldap/manifests/init.pp
+Error: Could not set 'present' on ensure: uninitialized class variable @@lock in Object at 52:/usr/local/etc/puppet/modules/ldap/manifests/init.pp
+Wrapped exception:
+uninitialized class variable @@lock in Object
+Error: /Stage[main]/Ldap/Package[net/nss_ldap]/ensure: change from absent to present failed: Could not set 'present' on ensure: uninitialized class variable @@lock in Object at 52:/usr/local/etc/puppet/modules/ldap/manifests/init.pp
+</code></pre>
+
+<p>The line it referred to was trying to install the <code>net/nss_ldap</code> package. I had
+run <code>pkg2ng</code> on the host and included the <a href="https://forge.puppetlabs.com/zleslie/pkgng">pkgng</a>
+module in the node&rsquo;s manifest.</p>
+
+<p>When I searched for <code>@@lock</code> in the Puppet source code, the only references I
+found were from the <code>freebsd</code> package provider. That provider uses the
+deprecated <code>pkg_</code> commands and for some reason is included in Puppet while
+<code>pkgng</code> is not.</p>
+
+<pre><code>[longb4-local@testdb /usr/ports/sysutils/puppet]$ sudo make fetch extract patch configure
+[longb4-local@testdb /usr/ports/sysutils/puppet]$ cd work/puppet-3.6.2/
+[longb4-local@testdb /usr/ports/sysutils/puppet/work/puppet-3.6.2]$ find . -exec grep -HnsiI '@@lock' {} \;                                                                                                                                                                       
+./lib/puppet/provider/package/freebsd.rb:18:  class_variable_set(:@@lock, Mutex.new)
+./lib/puppet/provider/package/freebsd.rb:73:    @@lock.synchronize do
+</code></pre>
+
+<h2>Solution</h2>
+
+<p>Since Puppet was trying to use the non-working <code>pkg_</code> commands, I made it use
+the <code>pkgng</code> package provider when installing packages on the affected node by
+adding this to the node manifest:</p>
+
+<pre><code>Package {
+    provider =&gt; pkgng,
+}
+</code></pre>
+
+<p>After that, Puppet runs completed successfully.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
       <h1 class="entry-title"><a href="/2014/05/29/lvm-extend/">Extending LVM Volume Size</a></h1>
     
     
@@ -207,6 +279,10 @@ limits are concerned.</p>
     <section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/2014/06/23/freebsd-puppet-uninitialized-class-variable-lock/">Puppet Errors on FreeBSD: Uninitialized Class Variable @@lock in Object</a>
+      </li>
     
       <li class="post">
         <a href="/2014/05/29/lvm-extend/">Extending LVM Volume Size</a>

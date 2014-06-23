@@ -5,12 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Unix Resource Limits - Packet Disarray</title>
+  <title>Puppet errors on FreeBSD: uninitialized class variable @@lock in Object - Packet Disarray</title>
   <meta name="author" content="Bethany Long">
 
   
-  <meta name="description" content="In Unix-like systems, the ulimit command lets you check resource limits. When
-these limits are updated, they only apply to sessions started after the &hellip;">
+  <meta name="description" content="I was vexed by this error when setting up a host with Puppet 3.6.2 on FreeBSD 9.2 recently: Error: Could not set 'present' on ensure: uninitialized &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -19,7 +18,7 @@ these limits are updated, they only apply to sessions started after the &hellip;
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="blog.packetdisarray.com/2014/05/19/ulimit">
+  <link rel="canonical" href="blog.packetdisarray.com/2014/06/23/freebsd-puppet-uninitialized-class-variable-lock">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="Packet Disarray" type="application/atom+xml">
@@ -70,7 +69,7 @@ these limits are updated, they only apply to sessions started after the &hellip;
   
   <header>
     
-      <h1 class="entry-title">Unix Resource Limits</h1>
+      <h1 class="entry-title">Puppet Errors on FreeBSD: Uninitialized Class Variable @@lock in Object</h1>
     
     
       <p class="meta">
@@ -86,71 +85,50 @@ these limits are updated, they only apply to sessions started after the &hellip;
   
 
 
-<time datetime="2014-05-19T00:00:00-07:00" pubdate data-updated="true">May 19<span>th</span>, 2014</time>
+<time datetime="2014-06-23T00:00:00-07:00" pubdate data-updated="true">Jun 23<span>rd</span>, 2014</time>
         
       </p>
     
   </header>
 
 
-<div class="entry-content"><p>In Unix-like systems, the <code>ulimit</code> command lets you check resource limits. When
-these limits are updated, they only apply to sessions started after the change.</p>
+<div class="entry-content"><p>I was vexed by this error when setting up a host with Puppet 3.6.2 on FreeBSD 9.2 recently:</p>
 
-<pre><code>$ ulimit -a
-core file size          (blocks, -c) unlimited
-data seg size           (kbytes, -d) 524288
-file size               (blocks, -f) unlimited
-max locked memory       (kbytes, -l) 335262
-max memory size         (kbytes, -m) 1004356
-open files                      (-n) 128
-pipe size            (512 bytes, -p) 1
-stack size              (kbytes, -s) 4096
-cpu time               (seconds, -t) unlimited
-max user processes              (-u) 64
-virtual memory          (kbytes, -v) 528384
+<pre><code>Error: Could not set 'present' on ensure: uninitialized class variable @@lock in Object at 52:/usr/local/etc/puppet/modules/ldap/manifests/init.pp
+Error: Could not set 'present' on ensure: uninitialized class variable @@lock in Object at 52:/usr/local/etc/puppet/modules/ldap/manifests/init.pp
+Wrapped exception:
+uninitialized class variable @@lock in Object
+Error: /Stage[main]/Ldap/Package[net/nss_ldap]/ensure: change from absent to present failed: Could not set 'present' on ensure: uninitialized class variable @@lock in Object at 52:/usr/local/etc/puppet/modules/ldap/manifests/init.pp
 </code></pre>
 
-<p>The one that you probably want to pay the most attention to is &ldquo;max user
-processes&rdquo;. Reducing it low enough will prevent a
-<a href="http://en.wikipedia.org/wiki/Fork_bomb">fork bomb</a> from succeeding in making
-your system unresponsive. However, setting it too low will keep users from doing
-normal tasks, especially if that involves compiling programs. Depending on the
-system&rsquo;s purpose and on whether a restrictive process limit is imposed on all
-users or just a few, anywhere from 50 to 300 or so could be a good choice.</p>
+<p>The line it referred to was trying to install the <code>net/nss_ldap</code> package. I had
+run <code>pkg2ng</code> on the host and included the <a href="https://forge.puppetlabs.com/zleslie/pkgng">pkgng</a>
+module in the node&rsquo;s manifest.</p>
 
-<p>Linux and Unix OSs tend to err on the side of permissiveness where process
-limits are concerned.</p>
+<p>When I searched for <code>@@lock</code> in the Puppet source code, the only references I
+found were from the <code>freebsd</code> package provider. That provider uses the
+deprecated <code>pkg_</code> commands and for some reason is included in Puppet while
+<code>pkgng</code> is not.</p>
 
-<pre><code>$ ulimit -u
-34290
+<pre><code>[longb4-local@testdb /usr/ports/sysutils/puppet]$ sudo make fetch extract patch configure
+[longb4-local@testdb /usr/ports/sysutils/puppet]$ cd work/puppet-3.6.2/
+[longb4-local@testdb /usr/ports/sysutils/puppet/work/puppet-3.6.2]$ find . -exec grep -HnsiI '@@lock' {} \;                                                                                                                                                                       
+./lib/puppet/provider/package/freebsd.rb:18:  class_variable_set(:@@lock, Mutex.new)
+./lib/puppet/provider/package/freebsd.rb:73:    @@lock.synchronize do
 </code></pre>
 
-<p>Oops. Better fix that.</p>
+<h2>Solution</h2>
 
-<!-- more -->
+<p>Since Puppet was trying to use the non-working <code>pkg_</code> commands, I made it use
+the <code>pkgng</code> package provider when installing packages on the affected node by
+adding this to the node manifest:</p>
 
-
-<p>Resource limits can be changed for a single session by giving a value after the
-command line flag for that limit. Once you lower a resource limit for a
-session, you might not be able to raise it again unless you&rsquo;re root.</p>
-
-<pre><code>$ ulimit -u 300
-$ ulimit -u
-300
-$ ulimit -u 34290
--bash: ulimit: max user processes: cannot modify limit: Operation not permitted
+<pre><code>Package {
+    provider =&gt; pkgng,
+}
 </code></pre>
 
-<p>If you want to change a resource limit for <em>all</em> new sessions, the method varies
-by OS.</p>
-
-<h2>Linux</h2>
-
-<p><em>More info:</em> <code>man 5 limits.conf</code></p>
-
-<h2>FreeBSD, NetBSD, OpenBSD</h2>
-
-<p><em>More info:</em> <code>man 5 login.conf</code>, <code>man 1 cap_mkdb</code></p>
+<p>After that, Puppet runs completed successfully.</p>
 </div>
 
 
@@ -173,7 +151,7 @@ by OS.</p>
   
 
 
-<time datetime="2014-05-19T00:00:00-07:00" pubdate data-updated="true">May 19<span>th</span>, 2014</time>
+<time datetime="2014-06-23T00:00:00-07:00" pubdate data-updated="true">Jun 23<span>rd</span>, 2014</time>
       
 
 
@@ -181,7 +159,7 @@ by OS.</p>
     
       <div class="sharing">
   
-  <a href="//twitter.com/share" class="twitter-share-button" data-url="blog.packetdisarray.com/2014/05/19/ulimit/" data-via="" data-counturl="blog.packetdisarray.com/2014/05/19/ulimit/" >Tweet</a>
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="blog.packetdisarray.com/2014/06/23/freebsd-puppet-uninitialized-class-variable-lock/" data-via="" data-counturl="blog.packetdisarray.com/2014/06/23/freebsd-puppet-uninitialized-class-variable-lock/" >Tweet</a>
   
   
   
@@ -190,8 +168,8 @@ by OS.</p>
     
     <p class="meta">
       
+        <a class="basic-alignment left" href="/2014/05/29/lvm-extend/" title="Previous Post: Extending LVM Volume Size">&laquo; Extending LVM Volume Size</a>
       
-        <a class="basic-alignment right" href="/2014/05/29/lvm-extend/" title="Next Post: Extending LVM Volume Size">Extending LVM Volume Size &raquo;</a>
       
     </p>
   </footer>

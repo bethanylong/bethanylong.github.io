@@ -9,8 +9,14 @@
         <lastmod>2014-06-11T21:37:15-07:00</lastmod>
     </url>
     <url>
+        <loc>
+            blog.packetdisarray.com/2014/06/23/freebsd-puppet-uninitialized-class-variable-lock/
+        </loc>
+        <lastmod>2014-06-23T12:11:08-07:00</lastmod>
+    </url>
+    <url>
         <loc>blog.packetdisarray.com/</loc>
-        <lastmod>2014-06-11T21:37:15-07:00</lastmod>
+        <lastmod>2014-06-23T12:11:08-07:00</lastmod>
     </url>
     <url>
         <loc>blog.packetdisarray.com/wishlist/</loc>
@@ -18,7 +24,7 @@
     </url>
     <url>
         <loc>blog.packetdisarray.com/archives/</loc>
-        <lastmod>2014-06-11T21:37:15-07:00</lastmod>
+        <lastmod>2014-06-23T12:11:08-07:00</lastmod>
     </url>
     <url>
         <loc>blog.packetdisarray.com/robots.txt</loc>
