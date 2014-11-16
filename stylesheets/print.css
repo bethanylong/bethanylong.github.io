@@ -36,7 +36,10 @@ article>h2
     background: none;
 }
 
-article>ul>li>a
+article>ul>li>a,
+article>ul>li>a:link,
+article>ul>li>a:hover,
+article>ul>li>a:active
 {
     text-decoration: none;
     color: black;
