@@ -24,7 +24,8 @@ article,
   padding: 0px;
 }
 
-h2
+h2,
+article>header
 {
-    padding-top: 0;
+    padding: 0;
 }
