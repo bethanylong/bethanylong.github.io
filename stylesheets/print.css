@@ -23,3 +23,9 @@ article,
   margin: 0px;
   padding: 0px;
 }
+
+h2
+{
+    padding-top: 0;
+    margin-bottom: 0.5em;
+}
