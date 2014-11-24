@@ -5,12 +5,15 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Unix Resource Limits - Packet Disarray</title>
+  <title>Bus error on FreeBSD with sudo and LDAP - Packet Disarray</title>
   <meta name="author" content="Bethany Long">
 
   
-  <meta name="description" content="In Unix-like systems, the ulimit command lets you check resource limits. When
-these limits are updated, they only apply to sessions started after the &hellip;">
+  <meta name="description" content="Today in weird ungoogleable errors: [longb4@host ~]$ sudo ls
+bar baz foo
+Bus error
+[longb4@host ~]$ echo $?
+138 Wat. [1] This was on FreeBSD 10.0- &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -19,7 +22,7 @@ these limits are updated, they only apply to sessions started after the &hellip;
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="blog.packetdisarray.com/2014/05/19/ulimit">
+  <link rel="canonical" href="blog.packetdisarray.com/2014/11/23/freebsd-sudo-ldap-bus-error">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/stylesheets/print.css" media="print" rel="stylesheet" type="text/css">
@@ -72,7 +75,7 @@ these limits are updated, they only apply to sessions started after the &hellip;
   
   <header>
     
-      <h1 class="entry-title">Unix Resource Limits</h1>
+      <h1 class="entry-title">Bus Error on FreeBSD With Sudo and LDAP</h1>
     
     
       <p class="meta">
@@ -88,71 +91,53 @@ these limits are updated, they only apply to sessions started after the &hellip;
   
 
 
-<time datetime="2014-05-19T00:00:00-07:00" pubdate data-updated="true">May 19<span>th</span>, 2014</time>
+<time datetime="2014-11-23T00:00:00-08:00" pubdate data-updated="true">Nov 23<span>rd</span>, 2014</time>
         
       </p>
     
   </header>
 
 
-<div class="entry-content"><p>In Unix-like systems, the <code>ulimit</code> command lets you check resource limits. When
-these limits are updated, they only apply to sessions started after the change.</p>
+<div class="entry-content"><p>Today in weird ungoogleable errors:</p>
 
-<pre><code>$ ulimit -a
-core file size          (blocks, -c) unlimited
-data seg size           (kbytes, -d) 524288
-file size               (blocks, -f) unlimited
-max locked memory       (kbytes, -l) 335262
-max memory size         (kbytes, -m) 1004356
-open files                      (-n) 128
-pipe size            (512 bytes, -p) 1
-stack size              (kbytes, -s) 4096
-cpu time               (seconds, -t) unlimited
-max user processes              (-u) 64
-virtual memory          (kbytes, -v) 528384
+<pre><code>[longb4@host ~]$ sudo ls
+bar     baz     foo
+Bus error
+[longb4@host ~]$ echo $?
+138
 </code></pre>
 
-<p>The one that you probably want to pay the most attention to is &ldquo;max user
-processes&rdquo;. Reducing it low enough will prevent a
-<a href="http://en.wikipedia.org/wiki/Fork_bomb">fork bomb</a> from succeeding in making
-your system unresponsive. However, setting it too low will keep users from doing
-normal tasks, especially if that involves compiling programs. Depending on the
-system&rsquo;s purpose and on whether a restrictive process limit is imposed on all
-users or just a few, anywhere from 50 to 300 or so could be a good choice.</p>
+<p><a href="https://www.destroyallsoftware.com/talks/wat">Wat</a>. [1]</p>
 
-<p>Linux and Unix OSs tend to err on the side of permissiveness where process
-limits are concerned.</p>
-
-<pre><code>$ ulimit -u
-34290
-</code></pre>
-
-<p>Oops. Better fix that.</p>
+<p>This was on FreeBSD 10.0-RELEASE (amd64), after executing what I thought would be a
+routine <code>pkg upgrade</code>. The pkgs that were thusly upgraded had been built in a
+<a href="https://www.freebsd.org/doc/handbook/ports-poudriere.html">Poudriere</a> bulk
+build just moments before. I was logged in as an LDAP user (via <code>pam_ldap</code>,
+<code>nss_ldap</code>, and <code>openldap-client</code>) and using <code>bash</code> as my shell. New SSH logins
+to LDAP users still worked and sudoers could still <code>sudo</code>, so I knew at least
+that PAM, the LDAP client, and <code>sudo</code> weren&rsquo;t completely hosed. Other commands I
+tried worked as expected &mdash; the misbehavior only manifested when I ran <code>sudo</code>.</p>
 
 <!-- more -->
 
 
-<p>Resource limits can be changed for a single session by giving a value after the
-command line flag for that limit. Once you lower a resource limit for a
-session, you might not be able to raise it again unless you&rsquo;re root.</p>
+<p>Things started making a bit more sense when I discovered that local users
+(including root) could <code>sudo</code> without the bus error occurring. This narrowed my
+issue down to the LDAP client stack, which in my experience is constantly
+looking for new and troubling ways to mysteriously break. I shouldn&rsquo;t have been
+surprised.</p>
 
-<pre><code>$ ulimit -u 300
-$ ulimit -u
-300
-$ ulimit -u 34290
--bash: ulimit: max user processes: cannot modify limit: Operation not permitted
-</code></pre>
+<p>In the end, I just forcibly rebuilt the packages for the LDAP client stack and
+then forcibly upgraded them on the client, after which the bus errors stopped
+happening. I&rsquo;m inferring that somewhere along the way, a package didn&rsquo;t get
+linked against the right library on the Poudriere server or a package didn&rsquo;t
+upgrade on the client. On FreeBSD machines that build their own pkgs through
+ports, I&rsquo;m in the habit of recursive and forcible <code>portupgrade</code>s when upgrading
+the LDAP client stack, but this experience shows that developing similar habits
+when using newer methods like Poudriere + <code>pkg upgrade</code> would be worthwhile.</p>
 
-<p>If you want to change a resource limit for <em>all</em> new sessions, the method varies
-by OS.</p>
-
-<h2>Linux</h2>
-
-<p><em>More info:</em> <code>man 5 limits.conf</code></p>
-
-<h2>FreeBSD, NetBSD, OpenBSD</h2>
-
-<p><em>More info:</em> <code>man 5 login.conf</code>, <code>man 1 cap_mkdb</code></p>
+<p>[1] Before you speak up, I know what a bus error is, but just haven&rsquo;t managed
+to provoke one on this architecture before &mdash; much less by accident.</p>
 </div>
 
 
@@ -175,7 +160,7 @@ by OS.</p>
   
 
 
-<time datetime="2014-05-19T00:00:00-07:00" pubdate data-updated="true">May 19<span>th</span>, 2014</time>
+<time datetime="2014-11-23T00:00:00-08:00" pubdate data-updated="true">Nov 23<span>rd</span>, 2014</time>
       
 
 
@@ -183,7 +168,7 @@ by OS.</p>
     
       <div class="sharing">
   
-  <a href="//twitter.com/share" class="twitter-share-button" data-url="blog.packetdisarray.com/2014/05/19/ulimit/" data-via="" data-counturl="blog.packetdisarray.com/2014/05/19/ulimit/" >Tweet</a>
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="blog.packetdisarray.com/2014/11/23/freebsd-sudo-ldap-bus-error/" data-via="" data-counturl="blog.packetdisarray.com/2014/11/23/freebsd-sudo-ldap-bus-error/" >Tweet</a>
   
   
   
@@ -192,8 +177,8 @@ by OS.</p>
     
     <p class="meta">
       
+        <a class="basic-alignment left" href="/2014/06/23/freebsd-puppet-uninitialized-class-variable-lock/" title="Previous Post: Puppet errors on FreeBSD: uninitialized class variable @@lock in Object">&laquo; Puppet errors on FreeBSD: uninitialized class variable @@lock in Object</a>
       
-        <a class="basic-alignment right" href="/2014/05/29/lvm-extend/" title="Next Post: Extending LVM Volume Size">Extending LVM Volume Size &raquo;</a>
       
     </p>
   </footer>

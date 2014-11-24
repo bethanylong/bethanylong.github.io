@@ -4,7 +4,7 @@
   <title><![CDATA[Packet Disarray]]></title>
   <link href="blog.packetdisarray.com/atom.xml" rel="self"/>
   <link href="blog.packetdisarray.com/"/>
-  <updated>2014-11-15T20:57:28-08:00</updated>
+  <updated>2014-11-23T22:41:05-08:00</updated>
   <id>blog.packetdisarray.com/</id>
   <author>
     <name><![CDATA[Bethany Long]]></name>
@@ -12,6 +12,54 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Bus error on FreeBSD with sudo and LDAP]]></title>
+    <link href="blog.packetdisarray.com/2014/11/23/freebsd-sudo-ldap-bus-error/"/>
+    <updated>2014-11-23T00:00:00-08:00</updated>
+    <id>blog.packetdisarray.com/2014/11/23/freebsd-sudo-ldap-bus-error</id>
+    <content type="html"><![CDATA[<p>Today in weird ungoogleable errors:</p>
+
+<pre><code>[longb4@host ~]$ sudo ls
+bar     baz     foo
+Bus error
+[longb4@host ~]$ echo $?
+138
+</code></pre>
+
+<p><a href="https://www.destroyallsoftware.com/talks/wat">Wat</a>. [1]</p>
+
+<p>This was on FreeBSD 10.0-RELEASE (amd64), after executing what I thought would be a
+routine <code>pkg upgrade</code>. The pkgs that were thusly upgraded had been built in a
+<a href="https://www.freebsd.org/doc/handbook/ports-poudriere.html">Poudriere</a> bulk
+build just moments before. I was logged in as an LDAP user (via <code>pam_ldap</code>,
+<code>nss_ldap</code>, and <code>openldap-client</code>) and using <code>bash</code> as my shell. New SSH logins
+to LDAP users still worked and sudoers could still <code>sudo</code>, so I knew at least
+that PAM, the LDAP client, and <code>sudo</code> weren&rsquo;t completely hosed. Other commands I
+tried worked as expected &mdash; the misbehavior only manifested when I ran <code>sudo</code>.</p>
+
+<!-- more -->
+
+
+<p>Things started making a bit more sense when I discovered that local users
+(including root) could <code>sudo</code> without the bus error occurring. This narrowed my
+issue down to the LDAP client stack, which in my experience is constantly
+looking for new and troubling ways to mysteriously break. I shouldn&rsquo;t have been
+surprised.</p>
+
+<p>In the end, I just forcibly rebuilt the packages for the LDAP client stack and
+then forcibly upgraded them on the client, after which the bus errors stopped
+happening. I&rsquo;m inferring that somewhere along the way, a package didn&rsquo;t get
+linked against the right library on the Poudriere server or a package didn&rsquo;t
+upgrade on the client. On FreeBSD machines that build their own pkgs through
+ports, I&rsquo;m in the habit of recursive and forcible <code>portupgrade</code>s when upgrading
+the LDAP client stack, but this experience shows that developing similar habits
+when using newer methods like Poudriere + <code>pkg upgrade</code> would be worthwhile.</p>
+
+<p>[1] Before you speak up, I know what a bus error is, but just haven&rsquo;t managed
+to provoke one on this architecture before &mdash; much less by accident.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Puppet errors on FreeBSD: uninitialized class variable @@lock in Object]]></title>
@@ -30,6 +78,9 @@ Error: /Stage[main]/Ldap/Package[net/nss_ldap]/ensure: change from absent to pre
 <p>The line it referred to was trying to install the <code>net/nss_ldap</code> package. I had
 run <code>pkg2ng</code> on the host and included the <a href="https://forge.puppetlabs.com/zleslie/pkgng">pkgng</a>
 module in the node&rsquo;s manifest.</p>
+
+<!-- more -->
+
 
 <p>When I searched for <code>@@lock</code> in the Puppet source code, the only references I
 found were from the <code>freebsd</code> package provider. That provider uses the

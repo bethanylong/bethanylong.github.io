@@ -74,6 +74,65 @@
       
   <header>
     
+      <h1 class="entry-title"><a href="/2014/11/23/freebsd-sudo-ldap-bus-error/">Bus Error on FreeBSD With Sudo and LDAP</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-11-23T00:00:00-08:00" pubdate data-updated="true">Nov 23<span>rd</span>, 2014</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Today in weird ungoogleable errors:</p>
+
+<pre><code>[longb4@host ~]$ sudo ls
+bar     baz     foo
+Bus error
+[longb4@host ~]$ echo $?
+138
+</code></pre>
+
+<p><a href="https://www.destroyallsoftware.com/talks/wat">Wat</a>. [1]</p>
+
+<p>This was on FreeBSD 10.0-RELEASE (amd64), after executing what I thought would be a
+routine <code>pkg upgrade</code>. The pkgs that were thusly upgraded had been built in a
+<a href="https://www.freebsd.org/doc/handbook/ports-poudriere.html">Poudriere</a> bulk
+build just moments before. I was logged in as an LDAP user (via <code>pam_ldap</code>,
+<code>nss_ldap</code>, and <code>openldap-client</code>) and using <code>bash</code> as my shell. New SSH logins
+to LDAP users still worked and sudoers could still <code>sudo</code>, so I knew at least
+that PAM, the LDAP client, and <code>sudo</code> weren&rsquo;t completely hosed. Other commands I
+tried worked as expected &mdash; the misbehavior only manifested when I ran <code>sudo</code>.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/2014/11/23/freebsd-sudo-ldap-bus-error/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
       <h1 class="entry-title"><a href="/2014/06/23/freebsd-puppet-uninitialized-class-variable-lock/">Puppet Errors on FreeBSD: Uninitialized Class Variable @@lock in Object</a></h1>
     
     
@@ -110,32 +169,12 @@ Error: /Stage[main]/Ldap/Package[net/nss_ldap]/ensure: change from absent to pre
 run <code>pkg2ng</code> on the host and included the <a href="https://forge.puppetlabs.com/zleslie/pkgng">pkgng</a>
 module in the node&rsquo;s manifest.</p>
 
-<p>When I searched for <code>@@lock</code> in the Puppet source code, the only references I
-found were from the <code>freebsd</code> package provider. That provider uses the
-deprecated <code>pkg_</code> commands and for some reason is included in Puppet while
-<code>pkgng</code> is not.</p>
-
-<pre><code>[longb4-local@testdb /usr/ports/sysutils/puppet]$ sudo make fetch extract patch configure
-[longb4-local@testdb /usr/ports/sysutils/puppet]$ cd work/puppet-3.6.2/
-[longb4-local@testdb /usr/ports/sysutils/puppet/work/puppet-3.6.2]$ find . -exec grep -HnsiI '@@lock' {} \;                                                                                                                                                                       
-./lib/puppet/provider/package/freebsd.rb:18:  class_variable_set(:@@lock, Mutex.new)
-./lib/puppet/provider/package/freebsd.rb:73:    @@lock.synchronize do
-</code></pre>
-
-<h2>Solution</h2>
-
-<p>Since Puppet was trying to use the non-working <code>pkg_</code> commands, I made it use
-the <code>pkgng</code> package provider when installing packages on the affected node by
-adding this to the node manifest:</p>
-
-<pre><code>Package {
-    provider =&gt; pkgng,
-}
-</code></pre>
-
-<p>After that, Puppet runs completed successfully.</p>
 </div>
   
+  
+    <footer>
+      <a rel="full-article" href="/2014/06/23/freebsd-puppet-uninitialized-class-variable-lock/">Read on &rarr;</a>
+    </footer>
   
 
 
@@ -281,6 +320,10 @@ limits are concerned.</p>
     <section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/2014/11/23/freebsd-sudo-ldap-bus-error/">Bus Error on FreeBSD With Sudo and LDAP</a>
+      </li>
     
       <li class="post">
         <a href="/2014/06/23/freebsd-puppet-uninitialized-class-variable-lock/">Puppet Errors on FreeBSD: Uninitialized Class Variable @@lock in Object</a>

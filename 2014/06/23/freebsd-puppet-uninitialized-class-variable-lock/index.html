@@ -107,6 +107,9 @@ Error: /Stage[main]/Ldap/Package[net/nss_ldap]/ensure: change from absent to pre
 run <code>pkg2ng</code> on the host and included the <a href="https://forge.puppetlabs.com/zleslie/pkgng">pkgng</a>
 module in the node&rsquo;s manifest.</p>
 
+<!-- more -->
+
+
 <p>When I searched for <code>@@lock</code> in the Puppet source code, the only references I
 found were from the <code>freebsd</code> package provider. That provider uses the
 deprecated <code>pkg_</code> commands and for some reason is included in Puppet while
@@ -173,6 +176,8 @@ adding this to the node manifest:</p>
         <a class="basic-alignment left" href="/2014/05/29/lvm-extend/" title="Previous Post: Extending LVM Volume Size">&laquo; Extending LVM Volume Size</a>
       
       
+        <a class="basic-alignment right" href="/2014/11/23/freebsd-sudo-ldap-bus-error/" title="Next Post: Bus error on FreeBSD with sudo and LDAP">Bus error on FreeBSD with sudo and LDAP &raquo;</a>
+      
     </p>
   </footer>
 </article>
@@ -184,6 +189,10 @@ adding this to the node manifest:</p>
     <section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/2014/11/23/freebsd-sudo-ldap-bus-error/">Bus Error on FreeBSD With Sudo and LDAP</a>
+      </li>
     
       <li class="post">
         <a href="/2014/06/23/freebsd-puppet-uninitialized-class-variable-lock/">Puppet Errors on FreeBSD: Uninitialized Class Variable @@lock in Object</a>
