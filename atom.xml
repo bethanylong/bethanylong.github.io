@@ -4,7 +4,7 @@
   <title><![CDATA[Packet Disarray]]></title>
   <link href="blog.packetdisarray.com/atom.xml" rel="self"/>
   <link href="blog.packetdisarray.com/"/>
-  <updated>2015-01-08T17:18:12-08:00</updated>
+  <updated>2015-03-01T15:11:51-08:00</updated>
   <id>blog.packetdisarray.com/</id>
   <author>
     <name><![CDATA[Bethany Long]]></name>
@@ -12,6 +12,97 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Yesteryear]]></title>
+    <link href="blog.packetdisarray.com/2015/03/01/yesteryear/"/>
+    <updated>2015-03-01T00:00:00-08:00</updated>
+    <id>blog.packetdisarray.com/2015/03/01/yesteryear</id>
+    <content type="html"><![CDATA[<p>*In early 2012, between when I applied for colleges and when I accepted one of
+them, I was invited to apply for <a href="https://cse.wwu.edu/cs/computer-sciencemath-scholars-program">a scholarship and mentoring
+program</a> at WWU
+for women in computer science and math. Now, having been part of that program
+for a couple years and already fairly close to graduating, I&rsquo;m overwhelmingly
+thankful for the opportunities it&rsquo;s given me.</p>
+
+<p>These were my answers to the questions I was asked when I applied.*</p>
+
+<!-- more -->
+
+
+<p><strong>Why do you want to major in computer science or math?</strong></p>
+
+<p>I have had a lifelong affinity for computers and math, as well as for helping
+people, so it should come as no surprise to you that I&rsquo;ve always been the go-to
+girl for computer and math help. As early as elementary school, teachers asked
+for my assistance with finicky computers rather than waiting for the district
+tech support, and they rarely bothered making answer keys for math homework
+since they knew they could use my paper instead. This naturally made me quite
+popular among my classmates as well, though I always did my best to help them
+learn the concepts, not just give them answers. These talents have continued
+throughout my life in school, though I hadn&rsquo;t until recently considered math or
+computers as a career. My perspective has changed, however, as the constant news
+about security breaches and other attacks on computer systems has grown to a
+fever pitch over the last year. Previously, I wanted to be a linguist or
+musician; my computer skills were more of a hobby than a professional interest.
+Being self-aggrandizing makes me feel sick to my stomach, but I recognize that
+for most people &mdash; even most computer people &mdash; information security is not a
+strong or enjoyable subject like it is for me! I wholeheartedly feel that it is
+my duty to work at defending our nation against computer attackers, whether for
+national security or the economy, because of my unusual combination of aptitude
+and interest in the field. Pursuing a computer science major is an essential
+step toward that goal.</p>
+
+<p><strong>What do you think makes you a successful student?</strong></p>
+
+<p>I am a successful student because I have high standards for myself and I&rsquo;m not
+afraid of hard work. Some might say that I&rsquo;m motivated by a fear of failure, and
+perhaps that&rsquo;s true &mdash; but I don&rsquo;t care whether it is or isn&rsquo;t. Where others
+experience fear, I see an opportunity to get the gears of my mind whirring and a
+powerful incentive to find a correct (or acceptable) solution. So while many
+people experience stage fright before a musical performance or test anxiety
+before a big exam, my strategy is to ignore any sense of fear I do notice
+creeping up on me, since I see it crippling others so often, and throw all I can
+at the situation. If I did feel any fear in the first place, it flees in terror
+of my indomitable force when I&rsquo;m fully prepared!</p>
+
+<p>My eagerness at tackling daunting challenges and my sheer joy when I succeed
+motivate me to expect nothing less of myself than my best effort. I know that,
+within reason, I can accomplish anything I set my mind to, and I refuse
+to let anyone or anything dissuade me. That being said, my close familiarity
+with my track record means that I judge myself far more harshly than anyone else
+does (except maybe religious fundamentalists &mdash; but that&rsquo;s another story).
+However, since I am my own toughest critic, I have the confidence to pursue my
+goals without tiptoeing around or cowering from others&#8217; disapproval. I owe my
+success to my self-assurance and my work ethic.</p>
+
+<p><strong>Beyond your academic record, tell us more about you.</strong></p>
+
+<p>There are a great many uncommon activities I take pleasure in, from belting out
+a sax cadenza in front of several hundred people, to gleefully persuading my car
+to coast at the speed limit for half a mile, to programming miniature LED raves.
+However, there isn&rsquo;t much short of firewalls or differentiation that gratifies
+me more than crocheting and cooking. Just the other day, I finally completed
+crocheting a large afghan, using over 1.6 miles of yarn (costing about $25) in
+total. It was truly an exercise in perseverance, but it paid off! I remember
+when I first started the project last July and I took it camping to pass the
+time; it seemed so overwhelming. I knew I could get away with just stopping then
+and leaving it as a scarf with an odd pattern, but I&rsquo;m so glad now that I pushed
+onward and finished. It&rsquo;s a great companion on cold evenings, and my cats seem
+to agree!</p>
+
+<p>Another activity I enjoy far more than I should be allowed to is cooking. It
+seems that many people view cooking as a chore to be avoided whenever possible,
+but I feel that food nourishes the soul as well as the body. So while I
+know that frying some rice or putting together a soup will take half an hour
+longer than pouring a pile of Cheez-Its, I also feel that creating a healthy
+meal out of real food is worth it for the satisfaction and fulfillment. Coaxing
+a pizza to emerge from flour, tomatoes, and cheese, for example, is far more
+rewarding than just ordering one anyway! Between crocheting and cooking, I not
+only save bucketloads of money versus buying finished products, but in
+exercising my creativity, I also mold myself into more of a well-rounded person.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Bus error on FreeBSD with sudo and LDAP]]></title>
