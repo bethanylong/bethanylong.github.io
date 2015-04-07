@@ -122,9 +122,9 @@ trusty old <code>pf.conf</code>.  Here&rsquo;s an excerpt:</p>
 </span><span class='line'># ...
 </span><span class='line'>
 </span><span class='line'>block log
-</span><span class='line'> 
+</span><span class='line'>
 </span><span class='line'>pass out all keep state
-</span><span class='line'> 
+</span><span class='line'>
 </span><span class='line'>pass in on $ext_if proto icmp
 </span><span class='line'>
 </span><span class='line'># (Allowing traffic to certain ports)
@@ -190,7 +190,7 @@ decided to dig <em>(groan)</em> deeper into the problematic names.</p>
 <span class='line-number'>13</span>
 <span class='line-number'>14</span>
 <span class='line-number'>15</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>[bethany@host ~]$ dig -t AAAA update.freebsd.org                                                                                                                                                                                                                                 
+</pre></td><td class='code'><pre><code class=''><span class='line'>[bethany@host ~]$ dig -t AAAA update.freebsd.org
 </span><span class='line'>
 </span><span class='line'>(...)
 </span><span class='line'>
@@ -200,7 +200,7 @@ decided to dig <em>(groan)</em> deeper into the problematic names.</p>
 </span><span class='line'>
 </span><span class='line'>(...)
 </span><span class='line'>
-</span><span class='line'>[bethany@host ~]$ time nc -z 2001:4f8:3:ffe0:406a:0:16:1a 80                                                                                                                                                                                                                     
+</span><span class='line'>[bethany@host ~]$ time nc -z 2001:4f8:3:ffe0:406a:0:16:1a 80
 </span><span class='line'>
 </span><span class='line'>real    0m15.632s
 </span><span class='line'>user    0m0.000s
