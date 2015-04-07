@@ -75,6 +75,82 @@
       
   <header>
     
+      <h1 class="entry-title"><a href="/2015/04/06/ipv6-timeouts-freebsd-pf/">IPv6 Timeouts on FreeBSD With PF</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-04-06T00:00:00-07:00" pubdate data-updated="true">Apr 6<span>th</span>, 2015</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>After migrating my public-facing cloud servers to shiny new FreeBSD VMs on
+DigitalOcean, I was somewhat disturbed by the long delays or timeouts I
+experienced when initiating connections to certain hosts, such as
+<code>pkg.freebsd.org</code> and <code>update.freebsd.org</code>. This would happen during the DNS
+lookup phase. The issue was not related to a single DNS server, or even to DNS
+lookups in general &mdash; when I manually did (for example) <code>dig update.freebsd.org
+@8.8.8.8</code>, I got results immediately. However, when I removed DO&rsquo;s two default
+IPv6 nameservers in <code>resolv.conf</code>, problematic lookups sped up, but they were
+still slow. I had enabled IPv6 when setting up the VMs, and I was using my
+trusty old <code>pf.conf</code>.  Here&rsquo;s an excerpt:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># (Setting up interfaces, macros, etc)
+</span><span class='line'># ...
+</span><span class='line'>
+</span><span class='line'>block log
+</span><span class='line'> 
+</span><span class='line'>pass out all keep state
+</span><span class='line'> 
+</span><span class='line'>pass in on $ext_if proto icmp
+</span><span class='line'>
+</span><span class='line'># (Allowing traffic to certain ports)
+</span><span class='line'># ...</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/2015/04/06/ipv6-timeouts-freebsd-pf/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
       <h1 class="entry-title"><a href="/2015/03/01/yesteryear/">Yesteryear</a></h1>
     
     
@@ -370,6 +446,10 @@ limits are concerned.</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/2015/04/06/ipv6-timeouts-freebsd-pf/">IPv6 Timeouts on FreeBSD With PF</a>
+      </li>
+    
+      <li class="post">
         <a href="/2015/03/01/yesteryear/">Yesteryear</a>
       </li>
     
@@ -383,10 +463,6 @@ limits are concerned.</p>
     
       <li class="post">
         <a href="/2014/05/29/lvm-extend/">Extending LVM Volume Size</a>
-      </li>
-    
-      <li class="post">
-        <a href="/2014/05/19/ulimit/">Unix Resource Limits</a>
       </li>
     
   </ul>

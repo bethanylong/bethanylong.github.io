@@ -4,7 +4,7 @@
   <title><![CDATA[Packet Disarray]]></title>
   <link href="blog.packetdisarray.com/atom.xml" rel="self"/>
   <link href="blog.packetdisarray.com/"/>
-  <updated>2015-03-01T15:12:46-08:00</updated>
+  <updated>2015-04-06T18:25:18-07:00</updated>
   <id>blog.packetdisarray.com/</id>
   <author>
     <name><![CDATA[Bethany Long]]></name>
@@ -12,6 +12,223 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[IPv6 timeouts on FreeBSD with PF]]></title>
+    <link href="blog.packetdisarray.com/2015/04/06/ipv6-timeouts-freebsd-pf/"/>
+    <updated>2015-04-06T00:00:00-07:00</updated>
+    <id>blog.packetdisarray.com/2015/04/06/ipv6-timeouts-freebsd-pf</id>
+    <content type="html"><![CDATA[<p>After migrating my public-facing cloud servers to shiny new FreeBSD VMs on
+DigitalOcean, I was somewhat disturbed by the long delays or timeouts I
+experienced when initiating connections to certain hosts, such as
+<code>pkg.freebsd.org</code> and <code>update.freebsd.org</code>. This would happen during the DNS
+lookup phase. The issue was not related to a single DNS server, or even to DNS
+lookups in general &mdash; when I manually did (for example) <code>dig update.freebsd.org
+@8.8.8.8</code>, I got results immediately. However, when I removed DO&rsquo;s two default
+IPv6 nameservers in <code>resolv.conf</code>, problematic lookups sped up, but they were
+still slow. I had enabled IPv6 when setting up the VMs, and I was using my
+trusty old <code>pf.conf</code>.  Here&rsquo;s an excerpt:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># (Setting up interfaces, macros, etc)
+</span><span class='line'># ...
+</span><span class='line'>
+</span><span class='line'>block log
+</span><span class='line'> 
+</span><span class='line'>pass out all keep state
+</span><span class='line'> 
+</span><span class='line'>pass in on $ext_if proto icmp
+</span><span class='line'>
+</span><span class='line'># (Allowing traffic to certain ports)
+</span><span class='line'># ...</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<!-- more -->
+
+
+<p>Not having any luck blaming the issue on one specific domain or nameserver, I
+decided to dig <em>(groan)</em> deeper into the problematic names.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>[bethany@host ~]$ dig update.freebsd.org
+</span><span class='line'>
+</span><span class='line'>(...)
+</span><span class='line'>
+</span><span class='line'>;; ANSWER SECTION:
+</span><span class='line'>update.freebsd.org.     261     IN      CNAME   update2.freebsd.org.
+</span><span class='line'>update2.freebsd.org.    261     IN      A       149.20.53.26
+</span><span class='line'>
+</span><span class='line'>(...)
+</span><span class='line'>
+</span><span class='line'>[bethany@host ~]$ time nc -z 149.20.53.26 80
+</span><span class='line'>Connection to 149.20.53.26 80 port [tcp/http] succeeded!
+</span><span class='line'>
+</span><span class='line'>real    0m0.004s
+</span><span class='line'>user    0m0.000s
+</span><span class='line'>sys     0m0.006s</span></code></pre></td></tr></table></div></figure>
+
+
+<p>No issues on IPv4, then. What about IPv6?</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>[bethany@host ~]$ dig -t AAAA update.freebsd.org                                                                                                                                                                                                                                 
+</span><span class='line'>
+</span><span class='line'>(...)
+</span><span class='line'>
+</span><span class='line'>;; ANSWER SECTION:
+</span><span class='line'>update.freebsd.org.     219     IN      CNAME   update2.freebsd.org.
+</span><span class='line'>update2.freebsd.org.    12      IN      AAAA    2001:4f8:3:ffe0:406a:0:16:1a
+</span><span class='line'>
+</span><span class='line'>(...)
+</span><span class='line'>
+</span><span class='line'>[bethany@host ~]$ time nc -z 2001:4f8:3:ffe0:406a:0:16:1a 80                                                                                                                                                                                                                     
+</span><span class='line'>
+</span><span class='line'>real    0m15.632s
+</span><span class='line'>user    0m0.000s
+</span><span class='line'>sys     0m0.009s</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Aha! (Note the lack of a &ldquo;connection succeeded&rdquo; message &mdash; it timed out.) When I
+tried to connect to other IPv6 hosts, I got timeouts again and again. What else
+could there be to check before running off crying to DO support that their image
+is borked?</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>[bethany@host ~]$ sudo pfctl -d
+</span><span class='line'>No ALTQ support in kernel
+</span><span class='line'>ALTQ related functions disabled
+</span><span class='line'>pf disabled
+</span><span class='line'>
+</span><span class='line'>[bethany@host ~]$ time nc -z 2001:4f8:3:ffe0:406a:0:16:1a 80
+</span><span class='line'>Connection to 2001:4f8:3:ffe0:406a:0:16:1a 80 port [tcp/http] succeeded!
+</span><span class='line'>
+</span><span class='line'>real    0m0.013s
+</span><span class='line'>user    0m0.000s
+</span><span class='line'>sys     0m0.010s
+</span><span class='line'>
+</span><span class='line'>[bethany@host ~]$ sudo pfctl -e
+</span><span class='line'>No ALTQ support in kernel
+</span><span class='line'>ALTQ related functions disabled
+</span><span class='line'>pf enabled</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This was frustrating and suspicious. PF should be keeping TCP state, and I
+haven&rsquo;t restricted outbound connections. What else could PF be blocking and
+causing trouble with? To find out, I checked <code>pflog</code> and initiated another
+forlorn connection:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>[bethany@host ~]$ sudo service pflog onestart
+</span><span class='line'>Starting pflog.
+</span><span class='line'>
+</span><span class='line'>[bethany@host ~]$ sudo tcpdump -nettti pflog0
+</span><span class='line'>tcpdump: WARNING: pflog0: no IPv4 address assigned
+</span><span class='line'>tcpdump: verbose output suppressed, use -v or -vv for full protocol decode
+</span><span class='line'>listening on pflog0, link-type PFLOG (OpenBSD pflog file), capture size 65535 bytes
+</span><span class='line'>capability mode sandbox enabled
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>00:00:00.000000 rule 0..16777216/0(match): block in on vtnet0: 2604:my:pre:fix::1 &gt; 2604:my:pre:fix::my:vm: ICMP6, neighbor advertisement, tgt is 2604:my:pre:fix::1, length 32
+</span><span class='line'>00:00:01.028675 rule 0..16777216/0(match): block in on vtnet0: 2604:my:pre:fix::1 &gt; 2604:my:pre:fix::my:vm: ICMP6, neighbor advertisement, tgt is 2604:my:pre:fix::1, length 32
+</span><span class='line'>00:00:01.002990 rule 0..16777216/0(match): block in on vtnet0: 2604:my:pre:fix::1 &gt; 2604:my:pre:fix::my:vm: ICMP6, neighbor advertisement, tgt is 2604:my:pre:fix::1, length 32</span></code></pre></td></tr></table></div></figure>
+
+
+<p>PF had been blocking IPv6&rsquo;s neighbor discovery protocols (which use ICMPv6)!
+After making a one-line fix to <code>pf.conf</code>&hellip;</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>pass in on $ext_if proto icmp6</span></code></pre></td></tr></table></div></figure>
+
+
+<p>&hellip;my issues subsided.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>[bethany@host ~]$ time sudo pkg update
+</span><span class='line'>Updating FreeBSD repository catalogue...
+</span><span class='line'>FreeBSD repository is up-to-date.
+</span><span class='line'>All repositories are up-to-date.
+</span><span class='line'>
+</span><span class='line'>real    0m0.590s
+</span><span class='line'>user    0m0.017s
+</span><span class='line'>sys     0m0.009s</span></code></pre></td></tr></table></div></figure>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Yesteryear]]></title>

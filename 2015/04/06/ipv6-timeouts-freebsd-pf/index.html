@@ -1,0 +1,424 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>IPv6 timeouts on FreeBSD with PF - Packet Disarray</title>
+  <meta name="author" content="Bethany Long">
+
+  
+  <meta name="description" content="After migrating my public-facing cloud servers to shiny new FreeBSD VMs on
+DigitalOcean, I was somewhat disturbed by the long delays or timeouts I &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="blog.packetdisarray.com/2015/04/06/ipv6-timeouts-freebsd-pf">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/stylesheets/print.css" media="print" rel="stylesheet" type="text/css">
+
+  <link href="/atom.xml" rel="alternate" title="Packet Disarray" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/lib/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Packet Disarray</a></h1>
+  
+    <h2>Despatches from longb4</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:blog.packetdisarray.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Home</a></li>
+  <li><a href="/archives">Archives</a></li>
+  <li><a href="https://github.com/bethanylong">GitHub</a></li>
+  <li><a href="http://pgp.mit.edu:11371/pks/lookup?op=get&search=0x183F156209E9E166">PGP: 0x183f156209e9e166</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">IPv6 Timeouts on FreeBSD With PF</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-04-06T00:00:00-07:00" pubdate data-updated="true">Apr 6<span>th</span>, 2015</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>After migrating my public-facing cloud servers to shiny new FreeBSD VMs on
+DigitalOcean, I was somewhat disturbed by the long delays or timeouts I
+experienced when initiating connections to certain hosts, such as
+<code>pkg.freebsd.org</code> and <code>update.freebsd.org</code>. This would happen during the DNS
+lookup phase. The issue was not related to a single DNS server, or even to DNS
+lookups in general &mdash; when I manually did (for example) <code>dig update.freebsd.org
+@8.8.8.8</code>, I got results immediately. However, when I removed DO&rsquo;s two default
+IPv6 nameservers in <code>resolv.conf</code>, problematic lookups sped up, but they were
+still slow. I had enabled IPv6 when setting up the VMs, and I was using my
+trusty old <code>pf.conf</code>.  Here&rsquo;s an excerpt:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># (Setting up interfaces, macros, etc)
+</span><span class='line'># ...
+</span><span class='line'>
+</span><span class='line'>block log
+</span><span class='line'> 
+</span><span class='line'>pass out all keep state
+</span><span class='line'> 
+</span><span class='line'>pass in on $ext_if proto icmp
+</span><span class='line'>
+</span><span class='line'># (Allowing traffic to certain ports)
+</span><span class='line'># ...</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<!-- more -->
+
+
+<p>Not having any luck blaming the issue on one specific domain or nameserver, I
+decided to dig <em>(groan)</em> deeper into the problematic names.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>[bethany@host ~]$ dig update.freebsd.org
+</span><span class='line'>
+</span><span class='line'>(...)
+</span><span class='line'>
+</span><span class='line'>;; ANSWER SECTION:
+</span><span class='line'>update.freebsd.org.     261     IN      CNAME   update2.freebsd.org.
+</span><span class='line'>update2.freebsd.org.    261     IN      A       149.20.53.26
+</span><span class='line'>
+</span><span class='line'>(...)
+</span><span class='line'>
+</span><span class='line'>[bethany@host ~]$ time nc -z 149.20.53.26 80
+</span><span class='line'>Connection to 149.20.53.26 80 port [tcp/http] succeeded!
+</span><span class='line'>
+</span><span class='line'>real    0m0.004s
+</span><span class='line'>user    0m0.000s
+</span><span class='line'>sys     0m0.006s</span></code></pre></td></tr></table></div></figure>
+
+
+<p>No issues on IPv4, then. What about IPv6?</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>[bethany@host ~]$ dig -t AAAA update.freebsd.org                                                                                                                                                                                                                                 
+</span><span class='line'>
+</span><span class='line'>(...)
+</span><span class='line'>
+</span><span class='line'>;; ANSWER SECTION:
+</span><span class='line'>update.freebsd.org.     219     IN      CNAME   update2.freebsd.org.
+</span><span class='line'>update2.freebsd.org.    12      IN      AAAA    2001:4f8:3:ffe0:406a:0:16:1a
+</span><span class='line'>
+</span><span class='line'>(...)
+</span><span class='line'>
+</span><span class='line'>[bethany@host ~]$ time nc -z 2001:4f8:3:ffe0:406a:0:16:1a 80                                                                                                                                                                                                                     
+</span><span class='line'>
+</span><span class='line'>real    0m15.632s
+</span><span class='line'>user    0m0.000s
+</span><span class='line'>sys     0m0.009s</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Aha! (Note the lack of a &ldquo;connection succeeded&rdquo; message &mdash; it timed out.) When I
+tried to connect to other IPv6 hosts, I got timeouts again and again. What else
+could there be to check before running off crying to DO support that their image
+is borked?</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>[bethany@host ~]$ sudo pfctl -d
+</span><span class='line'>No ALTQ support in kernel
+</span><span class='line'>ALTQ related functions disabled
+</span><span class='line'>pf disabled
+</span><span class='line'>
+</span><span class='line'>[bethany@host ~]$ time nc -z 2001:4f8:3:ffe0:406a:0:16:1a 80
+</span><span class='line'>Connection to 2001:4f8:3:ffe0:406a:0:16:1a 80 port [tcp/http] succeeded!
+</span><span class='line'>
+</span><span class='line'>real    0m0.013s
+</span><span class='line'>user    0m0.000s
+</span><span class='line'>sys     0m0.010s
+</span><span class='line'>
+</span><span class='line'>[bethany@host ~]$ sudo pfctl -e
+</span><span class='line'>No ALTQ support in kernel
+</span><span class='line'>ALTQ related functions disabled
+</span><span class='line'>pf enabled</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This was frustrating and suspicious. PF should be keeping TCP state, and I
+haven&rsquo;t restricted outbound connections. What else could PF be blocking and
+causing trouble with? To find out, I checked <code>pflog</code> and initiated another
+forlorn connection:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>[bethany@host ~]$ sudo service pflog onestart
+</span><span class='line'>Starting pflog.
+</span><span class='line'>
+</span><span class='line'>[bethany@host ~]$ sudo tcpdump -nettti pflog0
+</span><span class='line'>tcpdump: WARNING: pflog0: no IPv4 address assigned
+</span><span class='line'>tcpdump: verbose output suppressed, use -v or -vv for full protocol decode
+</span><span class='line'>listening on pflog0, link-type PFLOG (OpenBSD pflog file), capture size 65535 bytes
+</span><span class='line'>capability mode sandbox enabled
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>00:00:00.000000 rule 0..16777216/0(match): block in on vtnet0: 2604:my:pre:fix::1 &gt; 2604:my:pre:fix::my:vm: ICMP6, neighbor advertisement, tgt is 2604:my:pre:fix::1, length 32
+</span><span class='line'>00:00:01.028675 rule 0..16777216/0(match): block in on vtnet0: 2604:my:pre:fix::1 &gt; 2604:my:pre:fix::my:vm: ICMP6, neighbor advertisement, tgt is 2604:my:pre:fix::1, length 32
+</span><span class='line'>00:00:01.002990 rule 0..16777216/0(match): block in on vtnet0: 2604:my:pre:fix::1 &gt; 2604:my:pre:fix::my:vm: ICMP6, neighbor advertisement, tgt is 2604:my:pre:fix::1, length 32</span></code></pre></td></tr></table></div></figure>
+
+
+<p>PF had been blocking IPv6&rsquo;s neighbor discovery protocols (which use ICMPv6)!
+After making a one-line fix to <code>pf.conf</code>&hellip;</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>pass in on $ext_if proto icmp6</span></code></pre></td></tr></table></div></figure>
+
+
+<p>&hellip;my issues subsided.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>[bethany@host ~]$ time sudo pkg update
+</span><span class='line'>Updating FreeBSD repository catalogue...
+</span><span class='line'>FreeBSD repository is up-to-date.
+</span><span class='line'>All repositories are up-to-date.
+</span><span class='line'>
+</span><span class='line'>real    0m0.590s
+</span><span class='line'>user    0m0.017s
+</span><span class='line'>sys     0m0.009s</span></code></pre></td></tr></table></div></figure>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Bethany Long</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-04-06T00:00:00-07:00" pubdate data-updated="true">Apr 6<span>th</span>, 2015</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="blog.packetdisarray.com/2015/04/06/ipv6-timeouts-freebsd-pf/" data-via="" data-counturl="blog.packetdisarray.com/2015/04/06/ipv6-timeouts-freebsd-pf/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/2015/03/01/yesteryear/" title="Previous Post: Yesteryear">&laquo; Yesteryear</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/2015/04/06/ipv6-timeouts-freebsd-pf/">IPv6 Timeouts on FreeBSD With PF</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2015/03/01/yesteryear/">Yesteryear</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2014/11/23/freebsd-sudo-ldap-bus-error/">Bus Error on FreeBSD With Sudo and LDAP</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2014/06/23/freebsd-puppet-uninitialized-class-variable-lock/">Puppet Errors on FreeBSD: Uninitialized Class Variable @@lock in Object</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2014/05/29/lvm-extend/">Extending LVM Volume Size</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2015 - Bethany Long -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
