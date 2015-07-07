@@ -75,6 +75,61 @@
       
   <header>
     
+      <h1 class="entry-title"><a href="/2015/07/07/sorttable-ajax/">Sorttable.js Not Sorting Dynamically-created Tables</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-07-07T00:00:00-07:00" pubdate data-updated="true">Jul 7<span>th</span>, 2015</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>At work, I&rsquo;ve recently been building a web-based tool that aggregates
+information about network devices from a variety of sources, and allows
+searching based on given criteria. The js/html frontend communicates with a
+python backend via ajax requests. Having some experience with it in the past, I
+decided to use <a href="http://www.kryogenix.org/code/browser/sorttable/">sorttable.js</a>
+for sorting data by column.</p>
+
+<p>Sorttable.js has <a href="http://www.kryogenix.org/code/browser/sorttable/#ajaxtables">an easy way</a>
+to make a table sortable after dynamically adding it via DOM calls. Despite
+this, my table still wasn&rsquo;t sorting anything when I clicked on column headers.
+I was adding new table rows with (paraphrased)
+<code>document.getElementById('tableId').appendChild('someTrElem')</code>, and they were
+showing up in the table, but none of the table headers had events listening even
+after calling sorttable.makeSortable.</p>
+
+<p>Eventually, through exploring with my favorite DOM inspector, I discovered that
+all my table rows containing data had somehow been added as children of my
+<code>&lt;thead&gt;</code>, as opposed to the <code>&lt;tbody&gt;</code> I had also created. Once I started
+explicitly adding my new <code>&lt;tr&gt;</code>s to my <code>&lt;tbody&gt;</code> rather than the <code>&lt;table&gt;</code>, I
+was finally able to sort the table.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
       <h1 class="entry-title"><a href="/2015/04/06/ipv6-timeouts-freebsd-pf/">IPv6 Timeouts on FreeBSD With PF</a></h1>
     
     
@@ -446,6 +501,10 @@ limits are concerned.</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/2015/07/07/sorttable-ajax/">Sorttable.js Not Sorting Dynamically-created Tables</a>
+      </li>
+    
+      <li class="post">
         <a href="/2015/04/06/ipv6-timeouts-freebsd-pf/">IPv6 Timeouts on FreeBSD With PF</a>
       </li>
     
@@ -459,10 +518,6 @@ limits are concerned.</p>
     
       <li class="post">
         <a href="/2014/06/23/freebsd-puppet-uninitialized-class-variable-lock/">Puppet Errors on FreeBSD: Uninitialized Class Variable @@lock in Object</a>
-      </li>
-    
-      <li class="post">
-        <a href="/2014/05/29/lvm-extend/">Extending LVM Volume Size</a>
       </li>
     
   </ul>

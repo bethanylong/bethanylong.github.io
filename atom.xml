@@ -4,7 +4,7 @@
   <title><![CDATA[Packet Disarray]]></title>
   <link href="blog.packetdisarray.com/atom.xml" rel="self"/>
   <link href="blog.packetdisarray.com/"/>
-  <updated>2015-05-26T21:12:24-07:00</updated>
+  <updated>2015-07-07T14:23:39-07:00</updated>
   <id>blog.packetdisarray.com/</id>
   <author>
     <name><![CDATA[Bethany Long]]></name>
@@ -12,6 +12,34 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Sorttable.js not sorting dynamically-created tables]]></title>
+    <link href="blog.packetdisarray.com/2015/07/07/sorttable-ajax/"/>
+    <updated>2015-07-07T00:00:00-07:00</updated>
+    <id>blog.packetdisarray.com/2015/07/07/sorttable-ajax</id>
+    <content type="html"><![CDATA[<p>At work, I&rsquo;ve recently been building a web-based tool that aggregates
+information about network devices from a variety of sources, and allows
+searching based on given criteria. The js/html frontend communicates with a
+python backend via ajax requests. Having some experience with it in the past, I
+decided to use <a href="http://www.kryogenix.org/code/browser/sorttable/">sorttable.js</a>
+for sorting data by column.</p>
+
+<p>Sorttable.js has <a href="http://www.kryogenix.org/code/browser/sorttable/#ajaxtables">an easy way</a>
+to make a table sortable after dynamically adding it via DOM calls. Despite
+this, my table still wasn&rsquo;t sorting anything when I clicked on column headers.
+I was adding new table rows with (paraphrased)
+<code>document.getElementById('tableId').appendChild('someTrElem')</code>, and they were
+showing up in the table, but none of the table headers had events listening even
+after calling sorttable.makeSortable.</p>
+
+<p>Eventually, through exploring with my favorite DOM inspector, I discovered that
+all my table rows containing data had somehow been added as children of my
+<code>&lt;thead&gt;</code>, as opposed to the <code>&lt;tbody&gt;</code> I had also created. Once I started
+explicitly adding my new <code>&lt;tr&gt;</code>s to my <code>&lt;tbody&gt;</code> rather than the <code>&lt;table&gt;</code>, I
+was finally able to sort the table.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[IPv6 timeouts on FreeBSD with PF]]></title>
