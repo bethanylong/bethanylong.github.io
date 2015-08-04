@@ -61,7 +61,7 @@
   <li><a href="/">Home</a></li>
   <li><a href="/archives">Archives</a></li>
   <li><a href="https://github.com/bethanylong">GitHub</a></li>
-  <li><a href="https://keybase.io/bethanylong">PGP: 0x183f156209e9e166</a></li>
+  <li>PGP: 0x09e9e166 (<a href="https://pgp.mit.edu/pks/lookup?op=vindex&search=0x09E9E166">MIT</a>/<a href="https://keybase.io/bethanylong">Keybase</a>)</li>
 </ul>
 
 </nav>
@@ -69,6 +69,68 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/2015/08/03/cisco-webauth-mime-types/">Cisco Web Authentication Login Page MIME Type Restrictions</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-08-03T00:00:00-07:00" pubdate data-updated="true">Aug 3<span>rd</span>, 2015</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>I co-wrangle a few Cisco wireless LAN controllers (WLCs) that manage a variety
+of SSIDs, including some that authenticate users on a landing page. Webauth
+pages are in an interesting niche: they&rsquo;re among the pages many users see daily,
+and yet their design quality does not tend to be proportional to their
+prominence. That shouldn&rsquo;t be a surprise &mdash; the set intersection of Cisco
+wizards and web frontend designers is pretty small.</p>
+
+<p>I&rsquo;m not a Cisco wizard &mdash; but I could play one on TV, and somehow it has fallen
+to me to breathe new life into campus webauth landing pages. I wanted to use
+responsive design for optimal performance across phones, tablets, and computers,
+and images in SVG format that would look delightful at all zoom levels and pixel
+densities. My landing pages worked perfectly as served from an nginx testing
+server, but SVG logos failed to appear when uploaded as part of a webauth bundle
+and served on a testing SSID on the WLCs.</p>
+
+<p>The WLCs were indeed serving the SVGs, but careful sleuthing in the network
+monitor du jour (in Firefox: Ctrl-Shift-k &ndash;> Network) showed that the WLCs were
+setting the Content-Type header of the SVG responses to
+<code>application/octet-stream</code>, rather than the appropriate <code>image/svg+xml</code>.
+Browsers were thus obeying the WLC web servers&#8217; instructions to not show the
+SVGs as images. There is no reliable client-side (and client-friendly) way to
+get around this.</p>
+
+<p>Eventually, I decided to replace the SVGs with PNGs of about double the
+horizontal and vertical resolution specified for the logo <code>span</code>s in CSS, which
+results in acceptable appearance when slightly zoomed in. It&rsquo;s pretty silly that
+Cisco&rsquo;s WLCs have such a limited set of supported MIME types.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -501,6 +563,10 @@ limits are concerned.</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/2015/08/03/cisco-webauth-mime-types/">Cisco Web Authentication Login Page MIME Type Restrictions</a>
+      </li>
+    
+      <li class="post">
         <a href="/2015/07/07/sorttable-ajax/">Sorttable.js Not Sorting Dynamically-created Tables</a>
       </li>
     
@@ -514,10 +580,6 @@ limits are concerned.</p>
     
       <li class="post">
         <a href="/2014/11/23/freebsd-sudo-ldap-bus-error/">Bus Error on FreeBSD With Sudo and LDAP</a>
-      </li>
-    
-      <li class="post">
-        <a href="/2014/06/23/freebsd-puppet-uninitialized-class-variable-lock/">Puppet Errors on FreeBSD: Uninitialized Class Variable @@lock in Object</a>
       </li>
     
   </ul>

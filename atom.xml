@@ -4,7 +4,7 @@
   <title><![CDATA[Packet Disarray]]></title>
   <link href="blog.packetdisarray.com/atom.xml" rel="self"/>
   <link href="blog.packetdisarray.com/"/>
-  <updated>2015-07-07T14:23:39-07:00</updated>
+  <updated>2015-08-03T19:35:40-07:00</updated>
   <id>blog.packetdisarray.com/</id>
   <author>
     <name><![CDATA[Bethany Long]]></name>
@@ -12,6 +12,41 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Cisco web authentication login page MIME type restrictions]]></title>
+    <link href="blog.packetdisarray.com/2015/08/03/cisco-webauth-mime-types/"/>
+    <updated>2015-08-03T00:00:00-07:00</updated>
+    <id>blog.packetdisarray.com/2015/08/03/cisco-webauth-mime-types</id>
+    <content type="html"><![CDATA[<p>I co-wrangle a few Cisco wireless LAN controllers (WLCs) that manage a variety
+of SSIDs, including some that authenticate users on a landing page. Webauth
+pages are in an interesting niche: they&rsquo;re among the pages many users see daily,
+and yet their design quality does not tend to be proportional to their
+prominence. That shouldn&rsquo;t be a surprise &mdash; the set intersection of Cisco
+wizards and web frontend designers is pretty small.</p>
+
+<p>I&rsquo;m not a Cisco wizard &mdash; but I could play one on TV, and somehow it has fallen
+to me to breathe new life into campus webauth landing pages. I wanted to use
+responsive design for optimal performance across phones, tablets, and computers,
+and images in SVG format that would look delightful at all zoom levels and pixel
+densities. My landing pages worked perfectly as served from an nginx testing
+server, but SVG logos failed to appear when uploaded as part of a webauth bundle
+and served on a testing SSID on the WLCs.</p>
+
+<p>The WLCs were indeed serving the SVGs, but careful sleuthing in the network
+monitor du jour (in Firefox: Ctrl-Shift-k &ndash;> Network) showed that the WLCs were
+setting the Content-Type header of the SVG responses to
+<code>application/octet-stream</code>, rather than the appropriate <code>image/svg+xml</code>.
+Browsers were thus obeying the WLC web servers&#8217; instructions to not show the
+SVGs as images. There is no reliable client-side (and client-friendly) way to
+get around this.</p>
+
+<p>Eventually, I decided to replace the SVGs with PNGs of about double the
+horizontal and vertical resolution specified for the logo <code>span</code>s in CSS, which
+results in acceptable appearance when slightly zoomed in. It&rsquo;s pretty silly that
+Cisco&rsquo;s WLCs have such a limited set of supported MIME types.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Sorttable.js not sorting dynamically-created tables]]></title>

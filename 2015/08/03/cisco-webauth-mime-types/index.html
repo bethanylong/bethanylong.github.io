@@ -5,12 +5,12 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Sorttable.js not sorting dynamically-created tables - Packet Disarray</title>
+  <title>Cisco web authentication login page MIME type restrictions - Packet Disarray</title>
   <meta name="author" content="Bethany Long">
 
   
-  <meta name="description" content="At work, I&rsquo;ve recently been building a web-based tool that aggregates
-information about network devices from a variety of sources, and allows &hellip;">
+  <meta name="description" content="I co-wrangle a few Cisco wireless LAN controllers (WLCs) that manage a variety
+of SSIDs, including some that authenticate users on a landing page. &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -19,7 +19,7 @@ information about network devices from a variety of sources, and allows &hellip;
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="blog.packetdisarray.com/2015/07/07/sorttable-ajax">
+  <link rel="canonical" href="blog.packetdisarray.com/2015/08/03/cisco-webauth-mime-types">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/stylesheets/print.css" media="print" rel="stylesheet" type="text/css">
@@ -73,7 +73,7 @@ information about network devices from a variety of sources, and allows &hellip;
   
   <header>
     
-      <h1 class="entry-title">Sorttable.js Not Sorting Dynamically-created Tables</h1>
+      <h1 class="entry-title">Cisco Web Authentication Login Page MIME Type Restrictions</h1>
     
     
       <p class="meta">
@@ -89,33 +89,40 @@ information about network devices from a variety of sources, and allows &hellip;
   
 
 
-<time datetime="2015-07-07T00:00:00-07:00" pubdate data-updated="true">Jul 7<span>th</span>, 2015</time>
+<time datetime="2015-08-03T00:00:00-07:00" pubdate data-updated="true">Aug 3<span>rd</span>, 2015</time>
         
       </p>
     
   </header>
 
 
-<div class="entry-content"><p>At work, I&rsquo;ve recently been building a web-based tool that aggregates
-information about network devices from a variety of sources, and allows
-searching based on given criteria. The js/html frontend communicates with a
-python backend via ajax requests. Having some experience with it in the past, I
-decided to use <a href="http://www.kryogenix.org/code/browser/sorttable/">sorttable.js</a>
-for sorting data by column.</p>
+<div class="entry-content"><p>I co-wrangle a few Cisco wireless LAN controllers (WLCs) that manage a variety
+of SSIDs, including some that authenticate users on a landing page. Webauth
+pages are in an interesting niche: they&rsquo;re among the pages many users see daily,
+and yet their design quality does not tend to be proportional to their
+prominence. That shouldn&rsquo;t be a surprise &mdash; the set intersection of Cisco
+wizards and web frontend designers is pretty small.</p>
 
-<p>Sorttable.js has <a href="http://www.kryogenix.org/code/browser/sorttable/#ajaxtables">an easy way</a>
-to make a table sortable after dynamically adding it via DOM calls. Despite
-this, my table still wasn&rsquo;t sorting anything when I clicked on column headers.
-I was adding new table rows with (paraphrased)
-<code>document.getElementById('tableId').appendChild('someTrElem')</code>, and they were
-showing up in the table, but none of the table headers had events listening even
-after calling sorttable.makeSortable.</p>
+<p>I&rsquo;m not a Cisco wizard &mdash; but I could play one on TV, and somehow it has fallen
+to me to breathe new life into campus webauth landing pages. I wanted to use
+responsive design for optimal performance across phones, tablets, and computers,
+and images in SVG format that would look delightful at all zoom levels and pixel
+densities. My landing pages worked perfectly as served from an nginx testing
+server, but SVG logos failed to appear when uploaded as part of a webauth bundle
+and served on a testing SSID on the WLCs.</p>
 
-<p>Eventually, through exploring with my favorite DOM inspector, I discovered that
-all my table rows containing data had somehow been added as children of my
-<code>&lt;thead&gt;</code>, as opposed to the <code>&lt;tbody&gt;</code> I had also created. Once I started
-explicitly adding my new <code>&lt;tr&gt;</code>s to my <code>&lt;tbody&gt;</code> rather than the <code>&lt;table&gt;</code>, I
-was finally able to sort the table.</p>
+<p>The WLCs were indeed serving the SVGs, but careful sleuthing in the network
+monitor du jour (in Firefox: Ctrl-Shift-k &ndash;> Network) showed that the WLCs were
+setting the Content-Type header of the SVG responses to
+<code>application/octet-stream</code>, rather than the appropriate <code>image/svg+xml</code>.
+Browsers were thus obeying the WLC web servers&#8217; instructions to not show the
+SVGs as images. There is no reliable client-side (and client-friendly) way to
+get around this.</p>
+
+<p>Eventually, I decided to replace the SVGs with PNGs of about double the
+horizontal and vertical resolution specified for the logo <code>span</code>s in CSS, which
+results in acceptable appearance when slightly zoomed in. It&rsquo;s pretty silly that
+Cisco&rsquo;s WLCs have such a limited set of supported MIME types.</p>
 </div>
 
 
@@ -138,7 +145,7 @@ was finally able to sort the table.</p>
   
 
 
-<time datetime="2015-07-07T00:00:00-07:00" pubdate data-updated="true">Jul 7<span>th</span>, 2015</time>
+<time datetime="2015-08-03T00:00:00-07:00" pubdate data-updated="true">Aug 3<span>rd</span>, 2015</time>
       
 
 
@@ -146,7 +153,7 @@ was finally able to sort the table.</p>
     
       <div class="sharing">
   
-  <a href="//twitter.com/share" class="twitter-share-button" data-url="blog.packetdisarray.com/2015/07/07/sorttable-ajax/" data-via="" data-counturl="blog.packetdisarray.com/2015/07/07/sorttable-ajax/" >Tweet</a>
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="blog.packetdisarray.com/2015/08/03/cisco-webauth-mime-types/" data-via="" data-counturl="blog.packetdisarray.com/2015/08/03/cisco-webauth-mime-types/" >Tweet</a>
   
   
   
@@ -155,10 +162,8 @@ was finally able to sort the table.</p>
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/2015/04/06/ipv6-timeouts-freebsd-pf/" title="Previous Post: IPv6 timeouts on FreeBSD with PF">&laquo; IPv6 timeouts on FreeBSD with PF</a>
+        <a class="basic-alignment left" href="/2015/07/07/sorttable-ajax/" title="Previous Post: Sorttable.js not sorting dynamically-created tables">&laquo; Sorttable.js not sorting dynamically-created tables</a>
       
-      
-        <a class="basic-alignment right" href="/2015/08/03/cisco-webauth-mime-types/" title="Next Post: Cisco web authentication login page MIME type restrictions">Cisco web authentication login page MIME type restrictions &raquo;</a>
       
     </p>
   </footer>
