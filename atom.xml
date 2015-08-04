@@ -4,7 +4,7 @@
   <title><![CDATA[Packet Disarray]]></title>
   <link href="blog.packetdisarray.com/atom.xml" rel="self"/>
   <link href="blog.packetdisarray.com/"/>
-  <updated>2015-08-03T19:35:40-07:00</updated>
+  <updated>2015-08-03T19:42:57-07:00</updated>
   <id>blog.packetdisarray.com/</id>
   <author>
     <name><![CDATA[Bethany Long]]></name>
@@ -32,6 +32,9 @@ and images in SVG format that would look delightful at all zoom levels and pixel
 densities. My landing pages worked perfectly as served from an nginx testing
 server, but SVG logos failed to appear when uploaded as part of a webauth bundle
 and served on a testing SSID on the WLCs.</p>
+
+<!-- more -->
+
 
 <p>The WLCs were indeed serving the SVGs, but careful sleuthing in the network
 monitor du jour (in Firefox: Ctrl-Shift-k &ndash;> Network) showed that the WLCs were

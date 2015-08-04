@@ -61,7 +61,8 @@
   <li><a href="/">Home</a></li>
   <li><a href="/archives">Archives</a></li>
   <li><a href="https://github.com/bethanylong">GitHub</a></li>
-  <li>PGP: 0x09e9e166 (<a href="https://pgp.mit.edu/pks/lookup?op=vindex&search=0x09E9E166">MIT</a>/<a href="https://keybase.io/bethanylong">Keybase</a>)</li>
+  <li><a href="https://pgp.mit.edu/pks/lookup?op=vindex&search=0x09E9E166">PGP: MIT</a></li>
+  <li><a href="https://keybase.io/bethanylong">PGP: Keybase</a></li>
 </ul>
 
 </nav>
@@ -113,20 +114,12 @@ densities. My landing pages worked perfectly as served from an nginx testing
 server, but SVG logos failed to appear when uploaded as part of a webauth bundle
 and served on a testing SSID on the WLCs.</p>
 
-<p>The WLCs were indeed serving the SVGs, but careful sleuthing in the network
-monitor du jour (in Firefox: Ctrl-Shift-k &ndash;> Network) showed that the WLCs were
-setting the Content-Type header of the SVG responses to
-<code>application/octet-stream</code>, rather than the appropriate <code>image/svg+xml</code>.
-Browsers were thus obeying the WLC web servers&#8217; instructions to not show the
-SVGs as images. There is no reliable client-side (and client-friendly) way to
-get around this.</p>
-
-<p>Eventually, I decided to replace the SVGs with PNGs of about double the
-horizontal and vertical resolution specified for the logo <code>span</code>s in CSS, which
-results in acceptable appearance when slightly zoomed in. It&rsquo;s pretty silly that
-Cisco&rsquo;s WLCs have such a limited set of supported MIME types.</p>
 </div>
   
+  
+    <footer>
+      <a rel="full-article" href="/2015/08/03/cisco-webauth-mime-types/">Read on &rarr;</a>
+    </footer>
   
 
 
