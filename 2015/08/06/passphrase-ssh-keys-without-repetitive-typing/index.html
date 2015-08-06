@@ -1,0 +1,360 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Setting up passphrase-protected SSH keys without repetitive typing - Packet Disarray</title>
+  <meta name="author" content="Bethany Long">
+
+  
+  <meta name="description" content="I&rsquo;ve recently begun exploring Ansible, which is a Python-based configuration
+management and orchestration system that uses ssh for &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="blog.packetdisarray.com/2015/08/06/passphrase-ssh-keys-without-repetitive-typing">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/stylesheets/print.css" media="print" rel="stylesheet" type="text/css">
+
+  <link href="/atom.xml" rel="alternate" title="Packet Disarray" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/lib/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Packet Disarray</a></h1>
+  
+    <h2>Despatches from longb4</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:blog.packetdisarray.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Home</a></li>
+  <li><a href="/archives">Archives</a></li>
+  <li><a href="https://github.com/bethanylong">GitHub</a></li>
+  <li><a href="https://pgp.mit.edu/pks/lookup?op=vindex&search=0x09E9E166">PGP: MIT</a></li>
+  <li><a href="https://keybase.io/bethanylong">PGP: Keybase</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Setting Up Passphrase-protected SSH Keys Without Repetitive Typing</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-08-06T00:00:00-07:00" pubdate data-updated="true">Aug 6<span>th</span>, 2015</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>I&rsquo;ve recently begun exploring Ansible, which is a Python-based configuration
+management and orchestration system that uses ssh for authentication (when in
+unix land). As one can imagine, typing your password for every connection to
+each server gets tedious. The solution to this problem is <strong>not</strong> to use simpler
+passwords!</p>
+
+<!-- more -->
+
+
+<h2>Setting up keys</h2>
+
+<p>The canonical way of resolving this is to set up ssh keys with <code>ssh-keygen</code>. By
+default, this deposits your keys in <code>~/.ssh</code>, with your public key at
+<code>id_rsa.pub</code> and your private key (keep this secret!) at <code>id_rsa</code>. Then, if you
+append the contents of <code>id_rsa.pub</code> to <code>/home/someuser/.ssh/authorized_keys</code> on
+some other machine, you can do <code>ssh someuser@someothermachine</code> to log in as that
+user without typing a password. (This is assuming your system is set up similar
+to the vast majority of Unix machines with ssh daemons running.)</p>
+
+<p>In comparison to an attacker trying to guess a human-memorable password, brute
+forcing a 2048-bit key is outside the realm of possibility. So, systems that
+only allow ssh access with keys are considerably more secure. Some people
+configure their machines this way, but it&rsquo;s also very common for central
+git systems like GitHub and gitolite to require ssh keys for authentication.</p>
+
+<h2>Keys with passphrases</h2>
+
+<p>One issue raised by taking the default options in <code>ssh-keygen</code> is that if a key
+without a passphrase is authorized by remote machines but that key gets
+compromised, an attacker could get access to any of those machines without even
+needing a password. The easy way to mitigate this is to choose a passphrase when
+generating ssh keys.</p>
+
+<h2>Securely storing key passphrases</h2>
+
+<p>Of course, it may seem like putting a passphrase on your key gets you back where
+you started from the perspective of convenience. This is where a tool called
+<code>ssh-agent</code> comes in. Running <code>ssh-agent</code> starts a process that lets you add ssh
+private keys &mdash; only typing your passphrase once, when you add the key &mdash; and
+supplies the key when you initiate an ssh connection.</p>
+
+<p>When you run <code>ssh-agent</code>, it spits out some information about the process it
+started:</p>
+
+<pre><code>$ ssh-agent
+SSH_AUTH_SOCK=/tmp/ssh-vyRGU0IGInTm/agent.28010; export SSH_AUTH_SOCK;
+SSH_AGENT_PID=28011; export SSH_AGENT_PID;
+echo Agent pid 28011;
+</code></pre>
+
+<p>These are just commands that (for example) a script could use to set up
+<code>ssh-agent</code> for you by putting the <code>SSH_AUTH_SOCK</code> and <code>SSH_AGENT_PID</code> variables
+in your environment. We&rsquo;ll do it by hand.</p>
+
+<pre><code>$ SSH_AUTH_SOCK=/tmp/ssh-vyRGU0IGInTm/agent.28010; export SSH_AUTH_SOCK;
+$ SSH_AGENT_PID=28011; export SSH_AGENT_PID;
+$ env | grep SSH_A
+SSH_AGENT_PID=28011
+SSH_AUTH_SOCK=/tmp/ssh-vyRGU0IGInTm/agent.28010
+</code></pre>
+
+<p>(If you want to use this <code>ssh-agent</code> in multiple sessions/terminals on this
+machine, you&rsquo;ll need to add those variables to your environment again. You can&rsquo;t
+use <code>ssh-agent</code> without those environment variables set to valid values.)</p>
+
+<p>Once your session is set up to use <code>ssh-agent</code>, you can add your private key
+with <code>ssh-add</code>:</p>
+
+<pre><code>$ ssh-add
+Enter passphrase for /home/longb4/.ssh/id_rsa:
+Identity added: /home/longb4/.ssh/id_rsa (/home/longb4/.ssh/id_rsa)
+</code></pre>
+
+<p>Once your key is added, you can ssh to a user and machine that trusts your
+public key without needing to type a passphrase.</p>
+
+<h2>Easily transferring public keys</h2>
+
+<p>A simple way to get your local <code>id_rsa.pub</code> into a remote <code>authorized_keys</code> file
+is with <code>scp</code> and shell redirection:</p>
+
+<pre><code>$ scp ~/.ssh/id_rsa.pub user@otherhost:
+$ ssh user@otherhost
+user@otherhost's password:
+otherhost$ cat id_rsa.pub &gt;&gt; .ssh/authorized_keys
+otherhost$ logout
+Connection to otherhost closed.
+$ ssh user@otherhost
+otherhost$
+</code></pre>
+
+<p>However, this requires more interactivity than I&rsquo;d like. To improve the process,
+we can use <code>ssh-copy-id</code>, which does the same thing:</p>
+
+<pre><code>$ ssh-copy-id user@otherhost
+user@otherhost's password:
+Now try logging into the machine, with "ssh 'user@otherhost'", and check in:
+
+  ~/.ssh/authorized_keys
+
+to make sure we haven't added extra keys that you weren't expecting.
+</code></pre>
+
+<h2>Transferring public keys even more easily</h2>
+
+<p>I mentioned Ansible at the beginning because even though I already had a few of
+my servers set up to trust my key, not all of them did, and I <em>really</em> didn&rsquo;t
+feel like typing my password a few dozen times to transfer my key to the rest of
+them. An issue with many tools like <code>sshpass</code> that let you non-interactively
+give ssh your password is that they expect your password on the command line
+(which exposes your password to anyone running <code>ps</code>) or in a file (which hits
+disk in plaintext if you didn&rsquo;t bother setting up a ramdisk).</p>
+
+<p>Thankfully, there is a delightful tool called <code>ssh-deploy-key</code>, available on
+<a href="https://pypi.python.org/pypi/ssh-deploy-key">PyPI</a>, with
+<a href="http://ssh-deploy-key.readthedocs.org/en/latest/index.html">documentation</a>
+available. Assuming your password is the same on all remote hosts (because
+you&rsquo;re using central authentication, right?), it takes your password once
+without exposing it in <code>ps</code> or on disk:</p>
+
+<pre><code>(virtualenv) $ pip install ssh-deploy-key
+[...]
+(virtualenv) $ ssh-deploy-key otherhost1 otherhost2
+Enter common password for remote hosts:
+Distributing key '/home/longb4/.ssh/id_rsa.pub' to remote hosts in overwrite mode.
+  copying key to longb4@otherhost1:~/.ssh/authorized_keys                   SUCCESS
+  copying key to longb4@otherhost2:~/.ssh/authorized_keys                   SUCCESS
+</code></pre>
+
+<p>Then, <em>finally</em>, once your public key is distributed to your remote hosts and
+you have <code>ssh-agent</code> working happily, you can play with Ansible on remote hosts
+without typing any passwords to log in:</p>
+
+<pre><code>$ ansible -i inventory.ini -e 'ansible_python_interpreter="/usr/bin/env python"' all -m ping
+otherhost1 | success &gt;&gt; {
+    "changed": false,
+    "ping": "pong"
+}
+
+otherhost2 | success &gt;&gt; {
+    "changed": false,
+    "ping": "pong"
+}
+</code></pre>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Bethany Long</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-08-06T00:00:00-07:00" pubdate data-updated="true">Aug 6<span>th</span>, 2015</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="blog.packetdisarray.com/2015/08/06/passphrase-ssh-keys-without-repetitive-typing/" data-via="" data-counturl="blog.packetdisarray.com/2015/08/06/passphrase-ssh-keys-without-repetitive-typing/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/2015/08/03/cisco-webauth-mime-types/" title="Previous Post: Cisco web authentication login page MIME type restrictions">&laquo; Cisco web authentication login page MIME type restrictions</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/2015/08/06/passphrase-ssh-keys-without-repetitive-typing/">Setting Up Passphrase-protected SSH Keys Without Repetitive Typing</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2015/08/03/cisco-webauth-mime-types/">Cisco Web Authentication Login Page MIME Type Restrictions</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2015/07/07/sorttable-ajax/">Sorttable.js Not Sorting Dynamically-created Tables</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2015/04/06/ipv6-timeouts-freebsd-pf/">IPv6 Timeouts on FreeBSD With PF</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2015/03/01/yesteryear/">Yesteryear</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2015 - Bethany Long -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
