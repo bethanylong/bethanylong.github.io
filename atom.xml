@@ -4,7 +4,7 @@
   <title><![CDATA[Packet Disarray]]></title>
   <link href="blog.packetdisarray.com/atom.xml" rel="self"/>
   <link href="blog.packetdisarray.com/"/>
-  <updated>2015-08-06T15:49:22-07:00</updated>
+  <updated>2015-08-06T15:51:20-07:00</updated>
   <id>blog.packetdisarray.com/</id>
   <author>
     <name><![CDATA[Bethany Long]]></name>
@@ -57,7 +57,8 @@ generating ssh keys.</p>
 you started from the perspective of convenience. This is where a tool called
 <code>ssh-agent</code> comes in. Running <code>ssh-agent</code> starts a process that lets you add ssh
 private keys &mdash; only typing your passphrase once, when you add the key &mdash; and
-supplies the key when you initiate an ssh connection.</p>
+supplies the key when you initiate an ssh connection. This prevents you from
+needing to type the passphrase each time you connect.</p>
 
 <p>When you run <code>ssh-agent</code>, it spits out some information about the process it
 started:</p>
