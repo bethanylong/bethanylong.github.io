@@ -4,7 +4,7 @@
   <title><![CDATA[Packet Disarray]]></title>
   <link href="blog.packetdisarray.com/atom.xml" rel="self"/>
   <link href="blog.packetdisarray.com/"/>
-  <updated>2015-08-06T15:51:20-07:00</updated>
+  <updated>2015-08-06T19:36:26-07:00</updated>
   <id>blog.packetdisarray.com/</id>
   <author>
     <name><![CDATA[Bethany Long]]></name>
@@ -19,10 +19,9 @@
     <updated>2015-08-06T00:00:00-07:00</updated>
     <id>blog.packetdisarray.com/2015/08/06/passphrase-ssh-keys-without-repetitive-typing</id>
     <content type="html"><![CDATA[<p>I&rsquo;ve recently begun exploring Ansible, which is a Python-based configuration
-management and orchestration system that uses ssh for authentication (when in
-unix land). As one can imagine, typing your password for every connection to
-each server gets tedious. The solution to this problem is <strong>not</strong> to use simpler
-passwords!</p>
+management and orchestration system that uses ssh (when in unix land). As one
+can imagine, typing your password for every connection to each server gets
+tedious. The solution to this problem is <strong>not</strong> to use simpler passwords!</p>
 
 <!-- more -->
 
