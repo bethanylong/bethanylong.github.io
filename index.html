@@ -76,6 +76,56 @@
       
   <header>
     
+      <h1 class="entry-title"><a href="/2015/08/11/freebsd-10-pvhvm-xen/">FreeBSD 10 PVHVM on Xen</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-08-11T00:00:00-07:00" pubdate data-updated="true">Aug 11<span>th</span>, 2015</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>FreeBSD 10 <a href="https://wiki.freebsd.org/FreeBSD/XenNG">changed the supported Xen configurations</a>,
+notably providing Xen support by default in GENERIC using PVHVM mode.
+Previously, I&rsquo;d been using FreeBSD 9 (i386) using a XEN kernel and PV mode,
+which is deprecated in FreeBSD 10. (If you need a refresher on Xen modes, I
+highly recommend the article <a href="http://www.brendangregg.com/blog/2014-05-07/what-color-is-your-xen.html">Xen Modes: What Color Is Your Xen</a>.)</p>
+
+<p>There is a fairly <a href="https://forums.freebsd.org/threads/howto-create-a-freebsd-8-i386-xen-pv-domu.10268/">established procedure</a>
+that I tend to follow when setting up FreeBSD PV domUs, but it was difficult to
+find a guide on setting up PVHVM domUs on my current stack of open-source Xen
+(4.1) on Debian old-stable (7) using the <code>xm</code> toolchain.  Well, here it is.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/2015/08/11/freebsd-10-pvhvm-xen/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
       <h1 class="entry-title"><a href="/2015/08/06/passphrase-ssh-keys-without-repetitive-typing/">Setting Up Passphrase-protected SSH Keys Without Repetitive Typing</a></h1>
     
     
@@ -600,6 +650,10 @@ limits are concerned.</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/2015/08/11/freebsd-10-pvhvm-xen/">FreeBSD 10 PVHVM on Xen</a>
+      </li>
+    
+      <li class="post">
         <a href="/2015/08/06/passphrase-ssh-keys-without-repetitive-typing/">Setting Up Passphrase-protected SSH Keys Without Repetitive Typing</a>
       </li>
     
@@ -613,10 +667,6 @@ limits are concerned.</p>
     
       <li class="post">
         <a href="/2015/04/06/ipv6-timeouts-freebsd-pf/">IPv6 Timeouts on FreeBSD With PF</a>
-      </li>
-    
-      <li class="post">
-        <a href="/2015/03/01/yesteryear/">Yesteryear</a>
       </li>
     
   </ul>
