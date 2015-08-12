@@ -4,7 +4,7 @@
   <title><![CDATA[Packet Disarray]]></title>
   <link href="blog.packetdisarray.com/atom.xml" rel="self"/>
   <link href="blog.packetdisarray.com/"/>
-  <updated>2015-08-11T17:30:20-07:00</updated>
+  <updated>2015-08-12T09:55:05-07:00</updated>
   <id>blog.packetdisarray.com/</id>
   <author>
     <name><![CDATA[Bethany Long]]></name>
@@ -74,24 +74,44 @@ mangled iso. Modify this (and the other options) according to your setup.</p>
 
 <h2>Installing</h2>
 
-<p>Once your configuration is all set, boot the domU (I did <code>sudo xm create
-/etc/xen/eagle.cfg</code>). After the pretty bootloader, you&rsquo;ll probably be greeted
-with the <code>mountroot</code> prompt, which can&rsquo;t figure out what to boot from. Use the
-<code>?</code> command to enumerate your options &mdash; you probably want the <code>iso9660</code> one.</p>
+<p>Once your configuration is all set, boot the domU (I did <code>sudo xm create -c
+/etc/xen/eagle.cfg</code>).</p>
 
-<p>After that, install FreeBSD as normal. I recommend giving yourself a non-root
-user when you get the option (and putting it in the <code>wheel</code> group): in case the
-serial console gets weird on reboot (like it did for me), ssh&#8217;ing in as a
-regular user is just a <code>service sshd onestart</code> away, as opposed to using <code>ed</code> to
-set <code>PermitRootLogin yes</code> in <code>/etc/ssh/sshd_config</code>.</p>
+<p>After the pretty bootloader, you&rsquo;ll probably be greeted with the <code>mountroot</code>
+prompt, which can&rsquo;t figure out what to boot from. Use the <code>?</code> command to
+enumerate your options &mdash; since you&rsquo;re installing, you want to boot from your
+mangled iso. When I recreated the iso, one of my <code>mkisofs</code> parameters was
+<code>-V Headless_install</code>, so the <code>mountroot</code> prompt presented my iso option as
+<code>iso9660/Headless_install</code>. Thanks to my config file, the iso also appeared as
+<code>cd0</code>. Whichever one you use, tell <code>mountroot</code> to boot from
+<code>cd9660:name-of-your-device</code>.</p>
+
+<p>You&rsquo;ll also get a prompt for your system&rsquo;s console type &mdash; I chose the default
+(vt100).</p>
+
+<p>After that, install FreeBSD as normal. The page up and page down keys probably
+won&rsquo;t work as expected, but the arrow keys should. I recommend giving yourself a non-root
+user (with the <code>wheel</code> group) when you get the option, and enabling the ssh
+daemon: in case the serial console gets weird on reboot (like it did for me),
+ssh&#8217;ing in as a regular user is much easier than using <code>ed</code> to set
+<code>PermitRootLogin yes</code> in <code>/etc/ssh/sshd_config</code> and then doing <code>service sshd
+onerestart</code>.</p>
+
+<p>At the very end, before rebooting, take the option to open a shell in the newly
+installed system. The iso knows to use a serial console, but your new install
+doesn&rsquo;t, so you&rsquo;ll need to put <code>console="comconsole"</code> in <code>/boot/loader.conf</code>
+again.</p>
+
+<p>If you reboot right now, your domU will still want to boot from the iso. This is
+because of the <code>boot = "dc"</code> line in the Xen configuration file &mdash; the letters
+are Windows-style disk letters indicating that the second &ldquo;disk&rdquo; (hdb, the iso)
+has boot priority over the first (hda). Change this line to just <code>boot = "c"</code>,
+remove the iso&rsquo;s disk entry, and destroy (shutdown) and re-create the domU.</p>
+
+<p>If you get a <code>mountroot</code> prompt again on reboot looking for the install cd,
+you&rsquo;re probably still booting from the iso.</p>
 
 <h2>Lo and behold</h2>
-
-<p>After installing, reboot (and reattach to the <code>xm console</code> if necessary). It&rsquo;s
-possible that you&rsquo;ll get another <code>mountroot</code> prompt again &mdash; this time, you&rsquo;ll
-need to boot from the disk you installed to. It&rsquo;s possible that you won&rsquo;t see
-boot information (including the <code>mountroot</code> prompt) until you provide keyboard
-input early in the boot sequence once your console is attached.</p>
 
 <p>At this point, you should be able to treat your shiny new domU like any other.
 Have fun!</p>
