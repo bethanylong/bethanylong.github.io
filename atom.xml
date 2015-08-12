@@ -4,7 +4,7 @@
   <title><![CDATA[Packet Disarray]]></title>
   <link href="blog.packetdisarray.com/atom.xml" rel="self"/>
   <link href="blog.packetdisarray.com/"/>
-  <updated>2015-08-11T17:27:51-07:00</updated>
+  <updated>2015-08-11T17:30:20-07:00</updated>
   <id>blog.packetdisarray.com/</id>
   <author>
     <name><![CDATA[Bethany Long]]></name>
@@ -90,7 +90,7 @@ set <code>PermitRootLogin yes</code> in <code>/etc/ssh/sshd_config</code>.</p>
 <p>After installing, reboot (and reattach to the <code>xm console</code> if necessary). It&rsquo;s
 possible that you&rsquo;ll get another <code>mountroot</code> prompt again &mdash; this time, you&rsquo;ll
 need to boot from the disk you installed to. It&rsquo;s possible that you won&rsquo;t see
-boot information (including the <code>mountroot</code>) prompt until you provide keyboard
+boot information (including the <code>mountroot</code> prompt) until you provide keyboard
 input early in the boot sequence once your console is attached.</p>
 
 <p>At this point, you should be able to treat your shiny new domU like any other.
