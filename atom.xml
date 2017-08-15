@@ -4,7 +4,7 @@
   <title><![CDATA[Packet Disarray]]></title>
   <link href="blog.packetdisarray.com/atom.xml" rel="self"/>
   <link href="blog.packetdisarray.com/"/>
-  <updated>2015-11-25T21:18:29-08:00</updated>
+  <updated>2017-08-14T20:45:02-07:00</updated>
   <id>blog.packetdisarray.com/</id>
   <author>
     <name><![CDATA[Bethany Long]]></name>
@@ -12,6 +12,44 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[MP3 CDs in a 2005 Hyundai Tucson]]></title>
+    <link href="blog.packetdisarray.com/2017/08/14/hyundai-tucson-2005-mp3/"/>
+    <updated>2017-08-14T00:00:00-07:00</updated>
+    <id>blog.packetdisarray.com/2017/08/14/hyundai-tucson-2005-mp3</id>
+    <content type="html"><![CDATA[<p>In a cross-functional research opportunity blending music, computer science, and
+archaeology, I recently set out to burn some MP3 CDs for the 2005 Hyundai Tucson
+I&rsquo;m driving at the moment. (Yes, <em>right now</em>!) Actually, I&rsquo;m waiting for my
+Gordon Lightfoot discography to transcode, so I&rsquo;m writing this up for the next
+time I search for it.</p>
+
+<p>This now-ancient vehicle is kind of in the anti-sweet-spot for technology: it&rsquo;s
+new enough to play CDs and &ldquo;&rdquo;&ldquo;support&rdquo;&ldquo;&rdquo; CDs burned as MP3 data files rather
+than CDDA (Redbook) audio, but not new enough to have an aux input or Bluetooth.
+Worse, burning arbitrary MP3s may not work, as I found out after I transcoded
+and burnt all my favorite Kanye albums on one disc with the command in
+<a href="https://superuser.com/a/704535">this Stack Exchange answer</a> (spoiler alert:
+didn&rsquo;t work).</p>
+
+<p>Instead, what worked for me was a variant on
+<a href="https://stackoverflow.com/a/26109838">this Stack Exchange answer</a>, where I did
+the FLAC decoding and LAME encoding in separate steps, to intentionally strip
+any tags. I&rsquo;m not sure whether my original issue was extra metadata, variable
+bitrate encoding, or any extra streams ffmpeg could have been putting in the
+files and thereby confusing my elderly steed.</p>
+
+<p>Supposing I&rsquo;m in a directory called <code>Gordon Lightfoot</code> with album directories of
+FLACs, this is what worked for me:</p>
+
+<pre><code>for thing in */*.flac; do
+    echo "$thing" "${thing%flac}wav"  # Cool filename substitution!
+    flac -d -o "${thing%flac}wav" "$thing"  # Decode FLAC
+    lame -b 256 "${thing%flac}wav" "${thing%flac}mp3"  # Encode 256k CBR MP3
+done
+</code></pre>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[FreeBSD 10 PVHVM on Xen]]></title>

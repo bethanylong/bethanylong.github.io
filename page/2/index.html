@@ -5,12 +5,12 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Sorttable.js not sorting dynamically-created tables - Packet Disarray</title>
+  <title>Packet Disarray</title>
   <meta name="author" content="Bethany Long">
 
   
-  <meta name="description" content="At work, I&rsquo;ve recently been building a web-based tool that aggregates
-information about network devices from a variety of sources, and allows &hellip;">
+  <meta name="description" content="In Unix-like systems, the ulimit command lets you check resource limits. When
+these limits are updated, they only apply to sessions started after the &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -19,7 +19,7 @@ information about network devices from a variety of sources, and allows &hellip;
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="blog.packetdisarray.com/2015/07/07/sorttable-ajax">
+  <link rel="canonical" href="blog.packetdisarray.com/page/2">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/stylesheets/print.css" media="print" rel="stylesheet" type="text/css">
@@ -69,12 +69,15 @@ information about network devices from a variety of sources, and allows &hellip;
 </nav>
   <div id="main">
     <div id="content">
-      <div>
-<article class="hentry" role="article">
+      <div class="blog-index">
   
+  
+  
+    <article>
+      
   <header>
     
-      <h1 class="entry-title">Sorttable.js Not Sorting Dynamically-created Tables</h1>
+      <h1 class="entry-title"><a href="/2014/05/19/ulimit/">Unix Resource Limits</a></h1>
     
     
       <p class="meta">
@@ -90,83 +93,66 @@ information about network devices from a variety of sources, and allows &hellip;
   
 
 
-<time datetime="2015-07-07T00:00:00-07:00" pubdate data-updated="true">Jul 7<span>th</span>, 2015</time>
+<time datetime="2014-05-19T00:00:00-07:00" pubdate data-updated="true">May 19<span>th</span>, 2014</time>
         
       </p>
     
   </header>
 
 
-<div class="entry-content"><p>At work, I&rsquo;ve recently been building a web-based tool that aggregates
-information about network devices from a variety of sources, and allows
-searching based on given criteria. The js/html frontend communicates with a
-python backend via ajax requests. Having some experience with it in the past, I
-decided to use <a href="http://www.kryogenix.org/code/browser/sorttable/">sorttable.js</a>
-for sorting data by column.</p>
+  <div class="entry-content"><p>In Unix-like systems, the <code>ulimit</code> command lets you check resource limits. When
+these limits are updated, they only apply to sessions started after the change.</p>
 
-<p>Sorttable.js has <a href="http://www.kryogenix.org/code/browser/sorttable/#ajaxtables">an easy way</a>
-to make a table sortable after dynamically adding it via DOM calls. Despite
-this, my table still wasn&rsquo;t sorting anything when I clicked on column headers.
-I was adding new table rows with (paraphrased)
-<code>document.getElementById('tableId').appendChild('someTrElem')</code>, and they were
-showing up in the table, but none of the table headers had events listening even
-after calling sorttable.makeSortable.</p>
+<pre><code>$ ulimit -a
+core file size          (blocks, -c) unlimited
+data seg size           (kbytes, -d) 524288
+file size               (blocks, -f) unlimited
+max locked memory       (kbytes, -l) 335262
+max memory size         (kbytes, -m) 1004356
+open files                      (-n) 128
+pipe size            (512 bytes, -p) 1
+stack size              (kbytes, -s) 4096
+cpu time               (seconds, -t) unlimited
+max user processes              (-u) 64
+virtual memory          (kbytes, -v) 528384
+</code></pre>
 
-<p>Eventually, through exploring with my favorite DOM inspector, I discovered that
-all my table rows containing data had somehow been added as children of my
-<code>&lt;thead&gt;</code>, as opposed to the <code>&lt;tbody&gt;</code> I had also created. Once I started
-explicitly adding my new <code>&lt;tr&gt;</code>s to my <code>&lt;tbody&gt;</code> rather than the <code>&lt;table&gt;</code>, I
-was finally able to sort the table.</p>
+<p>The one that you probably want to pay the most attention to is &ldquo;max user
+processes&rdquo;. Reducing it low enough will prevent a
+<a href="http://en.wikipedia.org/wiki/Fork_bomb">fork bomb</a> from succeeding in making
+your system unresponsive. However, setting it too low will keep users from doing
+normal tasks, especially if that involves compiling programs. Depending on the
+system&rsquo;s purpose and on whether a restrictive process limit is imposed on all
+users or just a few, anywhere from 50 to 300 or so could be a good choice.</p>
+
+<p>Linux and Unix OSs tend to err on the side of permissiveness where process
+limits are concerned.</p>
+
+<pre><code>$ ulimit -u
+34290
+</code></pre>
+
+<p>Oops. Better fix that.</p>
+
 </div>
-
-
-  <footer>
-    <p class="meta">
-      
   
-
-<span class="byline author vcard">Posted by <span class="fn">Bethany Long</span></span>
-
-      
-
-
-
-
-
-
-
-
+  
+    <footer>
+      <a rel="full-article" href="/2014/05/19/ulimit/">Read on &rarr;</a>
+    </footer>
   
 
 
-<time datetime="2015-07-07T00:00:00-07:00" pubdate data-updated="true">Jul 7<span>th</span>, 2015</time>
-      
-
-
-    </p>
+    </article>
+  
+  <div class="pagination">
     
-      <div class="sharing">
-  
-  <a href="//twitter.com/share" class="twitter-share-button" data-url="blog.packetdisarray.com/2015/07/07/sorttable-ajax/" data-via="" data-counturl="blog.packetdisarray.com/2015/07/07/sorttable-ajax/" >Tweet</a>
-  
-  
-  
-</div>
-
+    <a href="/archives">Blog Archives</a>
     
-    <p class="meta">
-      
-        <a class="basic-alignment left" href="/2015/04/06/ipv6-timeouts-freebsd-pf/" title="Previous Post: IPv6 timeouts on FreeBSD with PF">&laquo; IPv6 timeouts on FreeBSD with PF</a>
-      
-      
-        <a class="basic-alignment right" href="/2015/08/03/cisco-webauth-mime-types/" title="Next Post: Cisco web authentication login page MIME type restrictions">Cisco web authentication login page MIME type restrictions &raquo;</a>
-      
-    </p>
-  </footer>
-</article>
-
+    <a class="next" href="/">Newer &rarr;</a>
+    
+  </div>
 </div>
-
 <aside class="sidebar">
   
     <section>
@@ -202,7 +188,6 @@ was finally able to sort the table.</p>
 
   
 </aside>
-
 
     </div>
   </div>

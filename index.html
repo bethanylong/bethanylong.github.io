@@ -76,6 +76,71 @@
       
   <header>
     
+      <h1 class="entry-title"><a href="/2017/08/14/hyundai-tucson-2005-mp3/">MP3 CDs in a 2005 Hyundai Tucson</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2017-08-14T00:00:00-07:00" pubdate data-updated="true">Aug 14<span>th</span>, 2017</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>In a cross-functional research opportunity blending music, computer science, and
+archaeology, I recently set out to burn some MP3 CDs for the 2005 Hyundai Tucson
+I&rsquo;m driving at the moment. (Yes, <em>right now</em>!) Actually, I&rsquo;m waiting for my
+Gordon Lightfoot discography to transcode, so I&rsquo;m writing this up for the next
+time I search for it.</p>
+
+<p>This now-ancient vehicle is kind of in the anti-sweet-spot for technology: it&rsquo;s
+new enough to play CDs and &ldquo;&rdquo;&ldquo;support&rdquo;&ldquo;&rdquo; CDs burned as MP3 data files rather
+than CDDA (Redbook) audio, but not new enough to have an aux input or Bluetooth.
+Worse, burning arbitrary MP3s may not work, as I found out after I transcoded
+and burnt all my favorite Kanye albums on one disc with the command in
+<a href="https://superuser.com/a/704535">this Stack Exchange answer</a> (spoiler alert:
+didn&rsquo;t work).</p>
+
+<p>Instead, what worked for me was a variant on
+<a href="https://stackoverflow.com/a/26109838">this Stack Exchange answer</a>, where I did
+the FLAC decoding and LAME encoding in separate steps, to intentionally strip
+any tags. I&rsquo;m not sure whether my original issue was extra metadata, variable
+bitrate encoding, or any extra streams ffmpeg could have been putting in the
+files and thereby confusing my elderly steed.</p>
+
+<p>Supposing I&rsquo;m in a directory called <code>Gordon Lightfoot</code> with album directories of
+FLACs, this is what worked for me:</p>
+
+<pre><code>for thing in */*.flac; do
+    echo "$thing" "${thing%flac}wav"  # Cool filename substitution!
+    flac -d -o "${thing%flac}wav" "$thing"  # Decode FLAC
+    lame -b 256 "${thing%flac}wav" "${thing%flac}mp3"  # Encode 256k CBR MP3
+done
+</code></pre>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
       <h1 class="entry-title"><a href="/2015/08/11/freebsd-10-pvhvm-xen/">FreeBSD 10 PVHVM on Xen</a></h1>
     
     
@@ -564,80 +629,9 @@ is called <code>storage</code> on a hypervisor called <code>host</code>, and <co
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/2014/05/19/ulimit/">Unix Resource Limits</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2014-05-19T00:00:00-07:00" pubdate data-updated="true">May 19<span>th</span>, 2014</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>In Unix-like systems, the <code>ulimit</code> command lets you check resource limits. When
-these limits are updated, they only apply to sessions started after the change.</p>
-
-<pre><code>$ ulimit -a
-core file size          (blocks, -c) unlimited
-data seg size           (kbytes, -d) 524288
-file size               (blocks, -f) unlimited
-max locked memory       (kbytes, -l) 335262
-max memory size         (kbytes, -m) 1004356
-open files                      (-n) 128
-pipe size            (512 bytes, -p) 1
-stack size              (kbytes, -s) 4096
-cpu time               (seconds, -t) unlimited
-max user processes              (-u) 64
-virtual memory          (kbytes, -v) 528384
-</code></pre>
-
-<p>The one that you probably want to pay the most attention to is &ldquo;max user
-processes&rdquo;. Reducing it low enough will prevent a
-<a href="http://en.wikipedia.org/wiki/Fork_bomb">fork bomb</a> from succeeding in making
-your system unresponsive. However, setting it too low will keep users from doing
-normal tasks, especially if that involves compiling programs. Depending on the
-system&rsquo;s purpose and on whether a restrictive process limit is imposed on all
-users or just a few, anywhere from 50 to 300 or so could be a good choice.</p>
-
-<p>Linux and Unix OSs tend to err on the side of permissiveness where process
-limits are concerned.</p>
-
-<pre><code>$ ulimit -u
-34290
-</code></pre>
-
-<p>Oops. Better fix that.</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/2014/05/19/ulimit/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
+    
+      <a class="prev" href="/page/2/">&larr; Older</a>
     
     <a href="/archives">Blog Archives</a>
     
@@ -648,6 +642,10 @@ limits are concerned.</p>
     <section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/2017/08/14/hyundai-tucson-2005-mp3/">MP3 CDs in a 2005 Hyundai Tucson</a>
+      </li>
     
       <li class="post">
         <a href="/2015/08/11/freebsd-10-pvhvm-xen/">FreeBSD 10 PVHVM on Xen</a>
@@ -665,10 +663,6 @@ limits are concerned.</p>
         <a href="/2015/07/07/sorttable-ajax/">Sorttable.js Not Sorting Dynamically-created Tables</a>
       </li>
     
-      <li class="post">
-        <a href="/2015/04/06/ipv6-timeouts-freebsd-pf/">IPv6 Timeouts on FreeBSD With PF</a>
-      </li>
-    
   </ul>
 </section>
 
@@ -682,7 +676,7 @@ limits are concerned.</p>
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2015 - Bethany Long -
+  Copyright &copy; 2017 - Bethany Long -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 
