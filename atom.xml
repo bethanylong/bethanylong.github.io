@@ -4,7 +4,7 @@
   <title><![CDATA[Packet Disarray]]></title>
   <link href="blog.packetdisarray.com/atom.xml" rel="self"/>
   <link href="blog.packetdisarray.com/"/>
-  <updated>2017-08-14T20:46:07-07:00</updated>
+  <updated>2017-08-14T20:50:18-07:00</updated>
   <id>blog.packetdisarray.com/</id>
   <author>
     <name><![CDATA[Bethany Long]]></name>
@@ -48,6 +48,9 @@ FLACs, this is what worked for me:</p>
     lame -b 256 "${thing%flac}wav" "${thing%flac}mp3"  # Encode 256k CBR MP3
 done
 </code></pre>
+
+<p>Then, I just burnt them in directories on a single-session (mastered) CD-R with the
+<a href="https://support.apple.com/kb/PH22122?locale=en_US">native OSX CD burning tool</a>.</p>
 ]]></content>
   </entry>
   
